@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Monster Quest v3.9.1</title>
+<title>Monster Quest v3.9.2</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#f8fafc;font-family:system-ui,sans-serif}.wrap{max-width:1400px;margin:auto;padding:20px}
 .grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px}.panel{background:#162033;border:1px solid #334155;border-radius:16px;padding:16px}
@@ -200,7 +200,7 @@ aside.panel{padding:8px;display:flex;flex-direction:column;gap:4px}
       </div>
       <div id="multiplayerStatus">Connecting to Firebase...</div>
     </div>
-    <div class="small" style="margin-top:18px">Multiplayer Stage 2B.1 v3.9.1 · Collection progress saves in this browser</div>
+    <div class="small" style="margin-top:18px">Multiplayer Stage 2B.2 v3.9.2 · Collection progress saves in this browser</div>
   </div>
 </div>
 
@@ -216,7 +216,7 @@ aside.panel{padding:8px;display:flex;flex-direction:column;gap:4px}
 </div>
 
 <div id="gameShell" class="wrap gameShell hiddenGame">
-<h1>🎲 Monster Quest v3.9.1</h1>
+<h1>🎲 Monster Quest v3.9.2</h1>
 <div class="sub">Accessory effects active — Silkweave, Spore, Briar and Heartwood now work; Road penalties clear at Town.</div>
 <div class="grid">
 <main class="panel"><h2>🗺️ Shared World</h2><div id="world"></div></main>
@@ -1041,8 +1041,29 @@ function keepPendingMovement(){
  completeBoardMovement(roll);
 }
 
+
+function ensureVisitedEvents(p){
+ if(!Array.isArray(p.visitedEvents))p.visitedEvents=[];
+ for(let i=0;i<4;i++){
+   if(!Array.isArray(p.visitedEvents[i]))p.visitedEvents[i]=[];
+ }
+ return p.visitedEvents;
+}
+function hasVisitedEvent(p,region,space){
+ ensureVisitedEvents(p);
+ return p.visitedEvents[region].includes(space);
+}
+function markVisitedEvent(p,region,space){
+ ensureVisitedEvents(p);
+ if(!p.visitedEvents[region].includes(space)){
+   p.visitedEvents[region].push(space);
+ }
+}
+
 function completeBoardMovement(baseRoll){
  const p=player();
+ ensureVisitedEvents(p);
+
  const moveBonus=movementBonus(p);
  const roll=baseRoll+moveBonus;
  $("dice").textContent=moveBonus?`🎲 ${baseRoll} + 💍${moveBonus} = ${roll}`:`🎲 ${roll}`;
@@ -1051,45 +1072,55 @@ function completeBoardMovement(baseRoll){
  const region=currentRegionIndex(p);
  const oldLocal=(p.locationMode==="town")?0:localSpace(p);
  const newLocal=Math.min(20,oldLocal+roll);
+
  p.position=region*20+newLocal;
  p.locationMode="board";
 
- render();
- syncMyMultiplayerState();
-
+ // Resolve the landing FIRST. Firebase receives the completed result afterwards.
  if(newLocal===20){
    p.locationMode="gate";
    beginBossGate();
    render();
+   syncMultiplayerAll();
    return;
  }
 
- if(G.monsterTiles[region].includes(newLocal)){
+ if(G.monsterTiles[region] && G.monsterTiles[region].includes(newLocal)){
+   render();
    beginOptionalEncounter(drawFreshMonster(region));
    return;
  }
 
- const event=G.worldEvents[region].find(e=>e.space===newLocal);
+ const regionEvents=Array.isArray(G.worldEvents[region]) ? G.worldEvents[region] : [];
+ const event=regionEvents.find(e=>Number(e.space)===Number(newLocal));
+
  if(event){
    if(event.type==="mystery"){
+     render();
      resolveBoardEvent(event,p,region);
      return;
    }
-   if(!p.visitedEvents[region].includes(event.space)){
-     p.visitedEvents[region].push(event.space);
+
+   if(!hasVisitedEvent(p,region,event.space)){
+     markVisitedEvent(p,region,event.space);
+     render();
      resolveBoardEvent(event,p,region);
      return;
    }
  }
 
+ render();
  $("roll").disabled=true;
  $("fight").disabled=true;
  $("pass").disabled=true;
  $("retreat").disabled=true;
  $("end").disabled=false;
- showMessage(`You rolled <b>${roll}</b> and moved from ${oldLocal===0?"🏘️ Town":"space "+oldLocal} to <b>space ${newLocal}</b> of Region ${region+1}.<br><br>🎲 <b>Your movement roll is complete.</b><br>Press <b>➡️ End Turn</b> to continue.`);
-}
 
+ showMessage(`You rolled <b>${roll}</b> and moved from ${oldLocal===0?"🏘️ Town":"space "+oldLocal} to <b>space ${newLocal}</b> of Region ${region+1}.<br><br>🎲 <b>Your movement roll is complete.</b><br>Press <b>➡️ End Turn</b> to continue.`);
+
+ // Empty-square movement is one completed action.
+ syncMultiplayerAll();
+}
 
 function drawFreshMonster(region){
 
@@ -1154,6 +1185,7 @@ function drawFreshMonster(region){
 }
 
 function resolveBoardEvent(ev,p,region){
+ ensureVisitedEvents(p);
  $("roll").disabled=true;$("end").disabled=false;
  let text=`${ev.icon} <b>${ev.name}</b><br>`;
  const effect=equippedAccessoryEffect(p);
@@ -1194,13 +1226,13 @@ function resolveBoardEvent(ev,p,region){
    }
 
    p.hp-=dmg;
-   text+=dmg>0?`A trap springs! You take <b>${dmg} damage</b>.`:`A trap springs, but you take <b>0 damage</b>.`;
+   text+=dmg>0?`A trap springs! You take <b>${dmg} damage</b>. HP: <b>${p.hp}/${p.maxHp}</b>.`:`A trap springs, but you take <b>0 damage</b>. HP: <b>${p.hp}/${p.maxHp}</b>.`;
    text+=note;
    if(p.hp<=0){respawn(p);return}
 
  }else if(ev.type==="shrine"){
    p.tempAttack[region]=Math.max(p.tempAttack[region],1);
-   text+=`The shrine grants <b>+1 Attack</b> until you leave this region.`;
+   text+=`The shrine grants <b>+1 Attack</b> until you leave this region. Current Attack: <b>+${attack(p)}</b>.`;
 
  }else if(ev.type==="mystery"){
    const roll=Math.floor(Math.random()*4);
@@ -1459,6 +1491,7 @@ function enterRoadOfDefeat(region){
  $("roll").disabled=true;$("fight").disabled=true;$("pass").disabled=true;$("retreat").disabled=true;$("end").disabled=false;
  render();
  showMessage(`💀 <b>Boss defeated you.</b><br>You have cleared the region, but must cross the ☠️ <b>Road of Defeat</b> before reaching the next Town.<br><br>Press <b>➡️ End Turn</b>.`);
+ syncMultiplayerAll();
 }
 
 function rollRoad(){
@@ -1807,6 +1840,8 @@ function defaultPlayerState(index){
  };
 }
 function multiplayerPlayerSnapshot(p){
+ // Firebase can omit empty nested arrays, so normalize them before every write.
+ ensureVisitedEvents(p);
  // Full JSON-safe gameplay state for Stage 2B.
  return JSON.parse(JSON.stringify({
    name:p.name,
@@ -1960,7 +1995,10 @@ function loadSharedWorldState(world,roomCode,role,playerIndex,roomPlayers,active
  if(roomPlayers){
    [0,1].forEach(i=>{
      const rp=roomPlayers[i] || roomPlayers[String(i)];
-     if(rp)Object.assign(G.players[i],rp.state||{});
+     if(rp){
+       Object.assign(G.players[i],rp.state||{});
+       ensureVisitedEvents(G.players[i]);
+     }
    });
  }
  G.active=activePlayer??0;
@@ -1979,6 +2017,7 @@ function applyRemoteRoomState(room){
      const rp=room.players[i] || room.players[String(i)];
      if(rp && rp.state){
        G.players[i]=Object.assign(defaultPlayerState(i),JSON.parse(JSON.stringify(rp.state)));
+       ensureVisitedEvents(G.players[i]);
      }
    });
  }
@@ -3893,7 +3932,7 @@ window.MQFirebase={
 
 try{
  await ensureSignedIn();
- window.MQMultiplayerBridge.setStatus("Firebase connected. Multiplayer Stage 2B.1 ready.");
+ window.MQMultiplayerBridge.setStatus("Firebase connected. Multiplayer Stage 2B.2 ready.");
 }catch(err){
  console.error(err);
  window.MQMultiplayerBridge.setStatus(`Firebase connection failed: ${err.message}`,true);
