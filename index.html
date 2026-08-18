@@ -1,0 +1,3312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Monster Quest v3.6.0</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#09111f;color:#f8fafc;font-family:system-ui,sans-serif}.wrap{max-width:1400px;margin:auto;padding:20px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px}.panel{background:#162033;border:1px solid #334155;border-radius:16px;padding:16px}
+h1{margin:0}.sub{color:#94a3b8;margin-top:4px}.region{background:#101827;border:1px solid #475569;border-radius:12px;padding:10px;margin:10px 0}.region.current{border-color:#60a5fa}.rh{display:flex;justify-content:space-between;gap:8px;margin-bottom:8px}.small{font-size:12px;color:#94a3b8}
+.spaces{display:grid;grid-template-columns:repeat(10,1fr);gap:5px}.space{height:55px;background:#263247;border:1px solid #475569;border-radius:7px;padding:5px;position:relative}.space.start{border-color:#22c55e}.space.enc{border-color:#b45309;background:#332616}.space.event{border-color:#0891b2;background:#123044}.space.boss{border-color:#e11d48;background:#3b1725}.space.me{outline:3px solid #60a5fa}.icon{position:absolute;right:4px;bottom:3px}.token{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#2563eb;border:3px solid #dbeafe;box-shadow:0 4px 10px #0008;font-size:20px;z-index:3}.road{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-top:8px}.roadSpace{min-height:64px;background:#35151c;border:1px solid #be123c;border-radius:8px;padding:5px;position:relative;font-size:11px}.roadSpace.me{outline:3px solid #f87171}.townTile{height:62px;background:#17352d;border:2px solid #22c55e;border-radius:10px;padding:7px;position:relative;margin-bottom:7px}.townTile.me{outline:3px solid #60a5fa}
+.players span{display:inline-block;background:#334155;padding:6px 9px;border-radius:20px;margin:2px;font-size:12px}.players .active{background:#2563eb;font-weight:900}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:10px}.stat{background:#0c1525;padding:8px;border-radius:9px;text-align:center;font-size:12px}.stat b{display:block;font-size:19px}
+.dice{text-align:center;font-size:48px;min-height:62px}.buttons{display:flex;gap:6px;flex-wrap:wrap}button{border:0;border-radius:9px;padding:10px 12px;background:#2563eb;color:white;font-weight:900;cursor:pointer}button.secondary{background:#475569}button.danger{background:#be123c}button:disabled{opacity:.4;cursor:not-allowed}
+.box{background:#0c1525;border-radius:10px;padding:11px;margin-top:9px;min-height:60px;line-height:1.4}.card{background:#0c1525;border:2px solid #7c3aed;border-radius:12px;padding:12px;text-align:center;margin-top:10px}.big{font-size:55px}.hidden{display:none}.collection{display:grid;grid-template-columns:1fr 1fr;gap:5px}.cc{background:#0c1525;border-radius:8px;padding:7px;font-size:12px}.cc small{display:block;color:#94a3b8;margin-top:3px}
+@media(max-width:950px){.grid{grid-template-columns:1fr}}@media(max-width:650px){.spaces{grid-template-columns:repeat(5,1fr)}.collection{grid-template-columns:1fr}}
+
+html,body{height:100%;overflow:hidden}
+body{padding:0}
+.wrap{max-width:none;height:100vh;padding:10px;display:flex;flex-direction:column}
+.wrap>h1{font-size:24px;line-height:1.1}
+.sub{font-size:12px;margin:2px 0 8px}
+.grid{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:10px}
+.panel{padding:10px;min-height:0;overflow:hidden}
+main.panel{display:flex;flex-direction:column}
+main.panel>h2{font-size:16px;margin:0 0 5px}
+#world{flex:1;min-height:0;overflow:auto;padding-right:4px}
+.region{padding:7px;margin:6px 0}
+.rh{margin-bottom:5px;font-size:12px}
+.small{font-size:10px}
+.spaces{grid-template-columns:repeat(10,1fr);gap:3px}
+.space{height:34px;padding:3px;font-size:10px}
+.townTile{height:38px;min-height:38px;padding:4px;margin-bottom:4px;font-size:11px}
+.road{gap:3px;margin-top:4px}
+.roadSpace{min-height:38px;padding:3px;font-size:9px}
+.icon{font-size:12px;right:2px;bottom:1px}
+.token{width:24px;height:24px;font-size:14px;border-width:2px}
+aside.panel{overflow:auto}
+.players span{font-size:10px;padding:4px 7px}
+.stats{gap:4px;margin-top:6px}
+.stat{padding:5px;font-size:10px}.stat b{font-size:16px}
+aside p{font-size:11px;margin:5px 0}
+.dice{font-size:34px;min-height:40px;height:40px}
+.buttons{gap:4px}
+button{padding:7px 9px;font-size:11px}
+.box{padding:7px;margin-top:5px;min-height:44px;font-size:11px}
+.card{padding:8px;margin-top:6px}
+.card h2{font-size:18px;margin:4px 0}
+.big{font-size:38px}
+.collection{grid-template-columns:1fr;gap:3px;max-height:110px;overflow:auto}
+.cc{padding:5px;font-size:10px}
+aside h3{font-size:12px;margin:7px 0 4px}
+.rules-collapse{margin-top:5px}
+@media(max-width:950px){
+ html,body{overflow:auto;height:auto}
+ .wrap{height:auto}
+ .grid{grid-template-columns:1fr}
+ #world{overflow:visible}
+}
+
+
+.startScreen{position:fixed;inset:0;z-index:999;background:radial-gradient(circle at 50% 30%,#1f2d46,#09111f 65%);display:flex;align-items:center;justify-content:center;padding:20px}
+.startCard{width:min(760px,94vw);background:linear-gradient(180deg,#1c2940,#111827);border:2px solid #6b7280;border-radius:24px;padding:32px;text-align:center;box-shadow:0 30px 80px #0009}
+.logoCrest{font-size:72px;filter:drop-shadow(0 8px 12px #0008)}
+.gameTitle{font-size:54px;line-height:.95;margin:8px 0 6px;letter-spacing:2px;font-weight:1000;text-transform:uppercase}
+.gameTitle span{display:block;font-size:22px;letter-spacing:8px;color:#f59e0b;margin-top:10px}
+.tagline{color:#cbd5e1;margin:12px auto 24px;max-width:560px}
+.menuButtons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}.menuButtons button{font-size:16px;padding:14px 22px;min-width:180px}
+.bookScreen{position:fixed;inset:0;z-index:1000;background:#09111f;display:none;padding:18px;overflow:auto}
+.bookPanel{max-width:1200px;margin:auto}.bookGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.bookCard{background:#111827;border:1px solid #475569;border-radius:10px;padding:7px;min-height:0}
+.bookCard b{font-size:11px;line-height:1.1;display:block}
+.bookCard small{display:block;color:#94a3b8;margin-top:3px;font-size:9px;line-height:1.2}
+.bookArt{width:100%;height:72px;border-radius:7px;overflow:hidden;background:#0c1525;margin-bottom:5px;display:flex;align-items:center;justify-content:center}
+.bookArt img{width:100%;height:100%;object-fit:cover;display:block}
+.bookUnknown{font-size:26px;color:#64748b}
+.bookRarity{font-size:8px;font-weight:900;letter-spacing:.6px;margin-bottom:2px}
+.bookRegion{font-size:8px;color:#cbd5e1;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.gameShell.hiddenGame{visibility:hidden}
+@media(max-width:1000px){.bookGrid{grid-template-columns:repeat(4,1fr)}}@media(max-width:800px){.bookGrid{grid-template-columns:repeat(3,1fr)}}@media(max-width:600px){.gameTitle{font-size:40px}.bookGrid{grid-template-columns:repeat(2,1fr)}.startCard{padding:22px}}
+
+
+/* v3.2 compact gameplay layout */
+.grid{grid-template-columns:minmax(0,1fr) 300px}
+aside.panel{padding:8px;display:flex;flex-direction:column;gap:4px}
+#players{display:none}
+.stats{margin-top:0;grid-template-columns:repeat(3,1fr)}
+.stat{padding:4px}.stat b{font-size:15px}
+#quickInfo{font-size:10px;line-height:1.25;margin:2px 0}
+#equipment{font-size:10px;min-height:0;padding:6px;margin-top:2px}
+#equipment hr{margin:4px 0}
+.dice{font-size:30px;min-height:34px;height:34px}
+.buttons{gap:3px}
+.buttons button{padding:6px 7px;font-size:10px}
+#msg{font-size:10px;min-height:38px;padding:6px;margin-top:2px}
+#monsterCardTemplate{max-height:56vh;overflow:auto}
+#monsterCardTemplate img{max-height:170px}
+#monsterCardTemplate [style*="height:210px"]{height:170px !important}
+#monsterCardTemplate [style*="font-size:25px"]{font-size:20px !important}
+#monsterCardTemplate [style*="font-size:23px"]{font-size:18px !important}
+.compactDetails{margin-top:2px}
+.compactDetails summary{font-size:10px;cursor:pointer;color:#cbd5e1}
+.compactDetails .collection{max-height:90px}
+.encounterMode #equipment,
+.encounterMode #dice,
+.encounterMode #msg,
+.encounterMode #runCardsDetails,
+.encounterMode #rulesDetails{display:none}
+.encounterMode #monsterCardTemplate{display:block !important}
+.encounterMode .buttons{margin-top:4px}
+.encounterMode .buttons button:not(#fight):not(#pass){display:none}
+@media(max-width:950px){
+ .grid{grid-template-columns:1fr}
+ aside.panel{display:block}
+ .encounterMode #equipment,.encounterMode #dice,.encounterMode #msg,
+ .encounterMode #runCardsDetails,.encounterMode #rulesDetails{display:block}
+ .encounterMode .buttons button{display:inline-block !important}
+}
+
+</style>
+</head>
+<body>
+
+<div id="startScreen" class="startScreen">
+  <div class="startCard">
+    <div class="logoCrest">🐉</div>
+    <div class="gameTitle">Monster Quest<span>BOARD ADVENTURE</span></div>
+    <div class="tagline">Travel through dangerous regions, collect monster cards, equip powerful loot, survive the Road of Defeat, and conquer the Ancient Dragon.</div>
+    <div class="menuButtons">
+      <button id="startGameBtn">🎲 New Game</button>
+      <button id="openBookBtn" class="secondary">📖 Collection Book</button>
+    </div>
+    <div class="small" style="margin-top:18px">Single-player prototype v3.6.0 · Collection progress saves in this browser</div>
+  </div>
+</div>
+
+<div id="bookScreen" class="bookScreen">
+  <div class="bookPanel panel">
+    <div class="rh"><div><h2 style="margin:0">📖 Collection Book</h2><div class="small">Every monster you encounter is recorded here.</div></div>
+      <button id="closeBookBtn" class="secondary">← Back</button>
+    </div>
+    <div class="box"><b id="menuBookProgress">0 discovered</b></div>
+    <div id="menuBook" class="bookGrid"></div>
+    <div class="buttons" style="margin-top:12px"><button id="menuResetBook" class="secondary">Reset Collection Book</button></div>
+  </div>
+</div>
+
+<div id="gameShell" class="wrap gameShell hiddenGame">
+<h1>🎲 Monster Quest v3.6.0</h1>
+<div class="sub">Accessory effects active — Silkweave, Spore, Briar and Heartwood now work; Road penalties clear at Town.</div>
+<div class="grid">
+<main class="panel"><h2>🗺️ Shared World</h2><div id="world"></div></main>
+<aside class="panel">
+<div id="players" class="players"></div>
+<div class="stats">
+<div class="stat">❤️ HP<b id="hp"></b></div><div class="stat">⚔️ Attack<b id="atk"></b></div><div class="stat">🃏 Cards<b id="cards"></b></div>
+</div>
+<p id="quickInfo">Region <b id="region"></b> · Space <b id="pos"></b><br>🧪 <b id="potions"></b> · 🗝️ <b id="key"></b> · 🗿 <b id="tempAtk"></b></p><div id="equipment" class="box"></div>
+<div class="dice" id="dice">🎲</div>
+<div class="buttons">
+<button id="roll">🎲 Roll to Move</button>
+<button id="fight" class="danger" disabled>⚔️ Fight</button>
+<button id="pass" class="secondary" disabled>Pass</button>
+<button id="retreat" class="secondary" disabled>🏘️ Return to Town</button>
+<button id="potion" class="secondary" disabled>🧪 Use Potion</button>
+<button id="end" class="secondary" disabled>➡️ End Turn</button>
+<button id="new" class="secondary">New Game</button><button id="menu" class="secondary">Main Menu</button>
+</div>
+<div id="msg" class="box"></div>
+<div id="monsterCardTemplate" style="
+  display: none;
+  width: 100%;
+  max-width: 320px;
+  margin: 10px auto;
+  padding: 8px;
+  background: linear-gradient(145deg, #78633a, #302615 45%, #8b7442);
+  border: 3px solid #d6b35a;
+  border-radius: 18px;
+  box-shadow: 0 0 0 3px #17120a, 0 12px 35px rgba(0,0,0,0.75);
+  color: white;
+  font-family: Georgia, 'Times New Roman', serif;
+">
+
+  <div style="
+    background: linear-gradient(180deg, #182337 0%, #101827 100%);
+    border: 2px solid #574725;
+    border-radius: 11px;
+    padding: 12px;
+  ">
+
+    <div style="
+      text-align:center;
+      font-size:10px;
+      letter-spacing:2px;
+      color:#94a3b8;
+      margin-bottom:4px;
+    ">
+      <span id="cardRegion">🌲 WHISPERING WOODS</span>
+    </div>
+
+    <div style="
+      text-align:center;
+      font-size:25px;
+      font-weight:bold;
+      letter-spacing:1px;
+      margin-bottom:7px;
+    ">
+      <span id="cardName">GOBLIN SCOUT</span>
+    </div>
+
+    <div style="
+      text-align:center;
+      background:#334155;
+      border:1px solid #64748b;
+      border-radius:20px;
+      width:110px;
+      margin:0 auto 10px auto;
+      padding:4px 8px;
+      font-family:Arial,sans-serif;
+      font-size:11px;
+      font-weight:bold;
+    ">
+      <span id="cardRarity">● COMMON</span>
+    </div>
+
+    <!-- MONSTER IMAGE -->
+    <div style="
+      width:100%;
+      height:210px;
+      border:3px solid #7b6738;
+      border-radius:8px;
+      overflow:hidden;
+      background:#172c21;
+      margin-bottom:10px;
+    ">
+      <img
+  id="cardMonsterImage"
+  src="goblin-scout.png"
+  alt="Goblin Scout"
+        style="
+          width:100%;
+          height:100%;
+          object-fit:cover;
+          display:block;
+        "
+      >
+    </div>
+
+    <div style="
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:6px;
+      font-family:Arial,sans-serif;
+    ">
+
+      <div style="
+        background:#1e293b;
+        border:1px solid #475569;
+        border-radius:7px;
+        padding:7px 3px;
+        text-align:center;
+      ">
+        <div style="font-size:10px;color:#94a3b8;">ROLL</div>
+        <div style="font-size:23px;font-weight:bold;"><span id="cardRoll">3+</span></div>
+      </div>
+
+      <div style="
+        background:#321a1a;
+        border:1px solid #7f1d1d;
+        border-radius:7px;
+        padding:7px 3px;
+        text-align:center;
+      ">
+        <div style="font-size:10px;color:#fca5a5;">DAMAGE</div>
+        <div style="font-size:23px;font-weight:bold;"><span id="cardDamage">2</span></div>
+      </div>
+
+      <div style="
+        background:#2b2615;
+        border:1px solid #806b25;
+        border-radius:7px;
+        padding:7px 3px;
+        text-align:center;
+      ">
+        <div style="font-size:10px;color:#fde68a;">KEY</div>
+        <div style="font-size:23px;font-weight:bold;"><span id="cardKeyChance">10%</span></div>
+      </div>
+
+    </div>
+
+    <div style="
+      text-align:center;
+      color:#d6b35a;
+      font-family:Arial,sans-serif;
+      font-size:10px;
+      font-weight:bold;
+      letter-spacing:2px;
+      margin:12px 0 7px;
+    ">
+      ───── LOOT ─────
+    </div>
+
+    <div style="
+      background:#20180e;
+      border:1px solid #806a34;
+      border-radius:8px;
+      padding:10px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    ">
+
+      <div style="
+        width:50px;
+        height:50px;
+        background:#151515;
+        border:1px solid #8a743e;
+        border-radius:7px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:30px;
+      ">
+        <span id="cardItemIcon">🗡️</span>
+      </div>
+
+      <div>
+        <div style="
+          font-size:10px;
+          color:#d6b35a;
+          font-family:Arial,sans-serif;
+        ">
+          <span id="cardItemType">WEAPON</span>
+        </div>
+
+        <div style="font-size:17px;font-weight:bold;">
+          <span id="cardItemName">Crude Dagger</span>
+        </div>
+
+        <div style="
+          font-family:Arial,sans-serif;
+          font-size:13px;
+          color:#86efac;
+        ">
+          <span id="cardItemEffect">⚔️ +1 Attack</span>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+<div id="boss" class="card hidden"></div>
+<details id="runCardsDetails" class="compactDetails">
+<summary>🃏 Current Run Cards (<span id="cardCountSmall">0</span>)</summary>
+<div id="collection" class="collection"></div>
+</details>
+
+<details id="rulesDetails" class="rules-collapse compactDetails"><summary>Rules</summary><p class="small"><b>Single-player test rules:</b> The 📖 Collection Book is separate from your current-run Monster Cards. The first time you encounter a monster, it is permanently added to the browser-saved Collection Book as 👁️ Encountered. Defeating that monster marks it 🏆 Defeated and reveals its loot details. Current-run Monster Cards and equipped loot still reset when you start a new game; Collection Book discoveries persist until you manually reset the book.</p></details>
+</aside>
+</div></div>
+
+<script>
+const REGIONS = [
+  {
+    name:"Whispering Woods",
+    icon:"🌲",
+    boss:{name:"Ancient Ent",icon:"🌳",difficulty:5,damage:4}
+  },
+  {
+    name:"Sunscorch Sands",
+    icon:"🏜️",
+    boss:{name:"Sand Tyrant",icon:"🐍",difficulty:5,damage:4}
+  },
+  {
+    name:"Frostpeak Mountains",
+    icon:"❄️",
+    boss:{name:"Frost Giant",icon:"🗿",difficulty:5,damage:4}
+  },
+  {
+    name:"Lava Lakes",
+    icon:"🌋",
+    boss:{name:"Infernal Warden",icon:"🔥",difficulty:5,damage:4}
+  },
+  {
+    name:"Stinky Swamp",
+    icon:"🐸",
+    boss:{name:"Swamp Overlord",icon:"🐊",difficulty:5,damage:4}
+  },
+  {
+    name:"The Fallen Kingdom",
+    icon:"🏰",
+    boss:{name:"Fallen King",icon:"👑",difficulty:5,damage:4}
+  },
+  {
+    name:"The Drowned Coast",
+    icon:"🌊",
+    boss:{name:"Leviathan",icon:"🐙",difficulty:5,damage:4}
+  },
+  {
+    name:"The Deadlands",
+    icon:"💀",
+    boss:{name:"Death Lord",icon:"☠️",difficulty:5,damage:4}
+  },
+  {
+    name:"The Shattered Realm",
+    icon:"✨",
+    boss:{name:"Void Colossus",icon:"👁️",difficulty:5,damage:4}
+  },
+  {
+    name:"The Iron Wastes",
+    icon:"⚙️",
+    boss:{name:"Iron Overlord",icon:"🤖",difficulty:5,damage:4}
+  }
+];
+
+const FINAL_BOSS={
+ name:"Ancient Dragon",
+ icon:"🐉",
+ difficulty:7,
+ damage:8,
+ hitsRequired:3
+};
+
+const MONSTERS=[
+ ["Goblin","👺","COMMON",2,2,"Goblin Dagger","⚔️ +1 Attack",1,0],
+ ["Giant Rat","🐀","COMMON",2,1,"Rat Fang","⚔️ +1 Attack",1,0],
+ ["Slime","🟢","COMMON",2,1,"Slime Core","❤️ +2 Max HP",0,2],
+ ["Spider","🕷️","COMMON",3,2,"Spider Silk","❤️ +2 Max HP",0,2],
+ ["Orc","🪓","UNCOMMON",3,3,"Orc Axe","⚔️ +2 Attack",2,0],
+ ["Skeleton","💀","UNCOMMON",3,2,"Bone Shield","❤️ +3 Max HP",0,3],
+ ["Ghost","👻","UNCOMMON",4,3,"Ghost Essence","⚔️ +2 Attack",2,0],
+ ["Troll","🧌","RARE",4,4,"Troll Hide","❤️ +5 Max HP",0,5],
+ ["Werewolf","🐺","RARE",5,4,"Werewolf Claw","⚔️ +3 Attack",3,0],
+ ["Dark Mage","🧙","RARE",5,4,"Magic Tome","⚔️ +2 Attack & ❤️ +2 Max HP",2,2],
+ ["Demon Champion","👹","LEGENDARY",6,6,"Demon Horn","⚔️ +5 Attack",5,0],
+ ["Ancient Golem","🗿","LEGENDARY",6,6,"Golem Core","❤️ +10 Max HP",0,10]
+];
+const RARITY_WEIGHT={COMMON:60,UNCOMMON:25,RARE:12,LEGENDARY:3};
+
+function lootSlot(monster){
+ const explicitType=(monster[9]||"").toLowerCase();
+ if(explicitType==="weapon")return "weapon";
+ if(explicitType==="armour")return "armour";
+ if(explicitType==="accessory")return "accessory";
+
+ const effect=monster[6]||"";
+ if(effect.includes("Attack"))return "weapon";
+ if(effect.includes("Max HP"))return "armour";
+ return "accessory";
+}
+function lootAttack(monster){return monster[7]||0}
+function lootHp(monster){return monster[8]||0}
+function equippedAttack(p){return p.equipment.weapon?lootAttack(p.equipment.weapon.monster):0}
+function equippedHp(p){return p.equipment.armour?lootHp(p.equipment.armour.monster):0}
+
+function equippedAccessoryName(p=player()){
+ return p.equipment.accessory ? p.equipment.accessory.monster[5] : "";
+}
+function equippedAccessoryEffect(p=player()){
+ return p.equipment.accessory ? (p.equipment.accessory.monster[6]||"") : "";
+}
+function hasAccessory(name,p=player()){
+ return equippedAccessoryName(p)===name;
+}
+function accessoryKey(name){
+ return (name||"accessory").toLowerCase().replace(/[^a-z0-9]+/g,"-");
+}
+function accessoryUsedThisRegion(name,regionIndex,p=player()){
+ const key=accessoryKey(name);
+ return !!(p.accessoryUses && p.accessoryUses[key] && p.accessoryUses[key][regionIndex]);
+}
+function markAccessoryUsed(name,regionIndex,p=player()){
+ const key=accessoryKey(name);
+ if(!p.accessoryUses)p.accessoryUses={};
+ if(!p.accessoryUses[key])p.accessoryUses[key]=[false,false,false,false];
+ p.accessoryUses[key][regionIndex]=true;
+}
+function canUseAccessoryOnce(p,regionIndex){
+ const effect=equippedAccessoryEffect(p);
+ const name=equippedAccessoryName(p);
+ return !!name && /once per region/i.test(effect) && !accessoryUsedThisRegion(name,regionIndex,p);
+}
+function movementBonus(p=player()){
+ const effect=equippedAccessoryEffect(p);
+ const m=effect.match(/\+(\d+)\s*movement on all dice rolls/i);
+ return m ? parseInt(m[1]) : 0;
+}
+function canRerollMovement(p,regionIndex){
+ return /reroll a movement roll/i.test(equippedAccessoryEffect(p)) &&
+        canUseAccessoryOnce(p,regionIndex);
+}
+function accessorySummary(p=player()){
+ return {
+   name: equippedAccessoryName(p),
+   effect: equippedAccessoryEffect(p)
+ };
+}
+function clearRoadPenalties(p){
+ p.roadAttackPenalty=0;
+ p.roadSlow=0;
+ p.roadCap=0;
+ p.roadPenalty=null;
+}
+
+const $=id=>document.getElementById(id);
+const d6=()=>Math.floor(Math.random()*6)+1;
+
+
+
+
+const BOOK_STORAGE_KEY="monsterQuestCollectionBookV1";
+function monsterBookId(monster){return (monster[0]||"unknown").toLowerCase().replace(/[^a-z0-9]+/g,"-")}
+function loadCollectionBook(){try{const raw=localStorage.getItem(BOOK_STORAGE_KEY);return raw?JSON.parse(raw):{}}catch(e){return {}}}
+function saveCollectionBook(){try{localStorage.setItem(BOOK_STORAGE_KEY,JSON.stringify(G.book))}catch(e){}}
+function discoverMonster(monster){
+ const id=monsterBookId(monster);
+ if(!G.book[id]){
+   G.book[id]={name:monster[0],icon:monster[1],discovered:true,defeated:false,loot:monster[5],effect:monster[6]};
+   saveCollectionBook(); return true;
+ }
+ return false;
+}
+function markMonsterDefeated(monster){
+ const id=monsterBookId(monster);
+ if(!G.book[id])G.book[id]={name:monster[0],icon:monster[1],discovered:true,defeated:true,loot:monster[5],effect:monster[6]};
+ else G.book[id].defeated=true;
+ saveCollectionBook();
+}
+
+const ROAD_PENALTIES=[
+ {name:"Blood Toll",icon:"❤️",desc:"Lose 2 HP",type:"damage",value:2},
+ {name:"Brutal Wound",icon:"💥",desc:"Take 3 damage",type:"damage",value:3},
+ {name:"Sacrifice",icon:"🃏",desc:"Discard 1 Monster Card of your choice",type:"discard"},
+ {name:"Broken Weapon",icon:"⚔️",desc:"-1 Attack until next Town",type:"attack",value:1},
+ {name:"Shattered Supplies",icon:"🧪",desc:"Discard 1 Health Potion",type:"potion"},
+ {name:"Exhaustion",icon:"🐌",desc:"-2 from your next Road roll",type:"slow",value:2},
+ {name:"Deep Wound",icon:"🩸",desc:"Lose 4 HP",type:"damage",value:4},
+ {name:"Heavy Burden",icon:"🎒",desc:"Next Road roll is capped at 3",type:"cap",value:3}
+];
+
+function makeRoad(){
+ const pool=[...ROAD_PENALTIES].sort(()=>Math.random()-0.5);
+ return pool.slice(0,6);
+}
+
+const EVENT_TYPES=[
+ {type:"campfire",icon:"🔥",name:"Campfire"},
+ {type:"treasure",icon:"💎",name:"Treasure Chest"},
+ {type:"trap",icon:"☠️",name:"Trap"},
+ {type:"shrine",icon:"🗿",name:"Shrine"},
+ {type:"mystery",icon:"❓",name:"Mystery Event"}
+];
+
+function makeBoardEvents(){
+ const available=[2,4,6,8,10,12,14,16,18];
+ const picked=[];
+ EVENT_TYPES.forEach(ev=>{
+   const choices=available.filter(x=>!picked.includes(x));
+   const space=choices[Math.floor(Math.random()*choices.length)];
+   picked.push(space);
+ });
+ return EVENT_TYPES.map((ev,i)=>({...ev,space:picked[i]}));
+}
+
+let G;
+
+function chooseRarity(){
+ let n=Math.random()*100;
+ for(const r of ["COMMON","UNCOMMON","RARE","LEGENDARY"]){
+   n-=RARITY_WEIGHT[r]; if(n<0)return r;
+ }
+ return "COMMON";
+}
+
+function makeEncounters(regionIndex){
+ const pool=[...MONSTERS], result=[];
+ for(let i=0;i<4;i++){
+   const m=pool.splice(Math.floor(Math.random()*pool.length),1)[0];
+   const rarity=chooseRarity();
+   const rarityDifficulty={COMMON:3,UNCOMMON:4,RARE:5,LEGENDARY:6};
+   const space=3+Math.floor(Math.random()*15); // 3..17
+   result.push({
+     monster:m,rarity,space,
+     difficulty:rarityDifficulty[rarity],
+     used:false
+   });
+ }
+ return result.sort((a,b)=>a.space-b.space);
+}
+
+function newGame(){ setEncounterMode(false);
+ G={
+   regionOrder:
+  [...Array(REGIONS.length).keys()]
+    .sort(()=>Math.random()-0.5)
+    .slice(0,4),
+   active:0,
+   phase:"move",
+   encounter:null,
+   pendingMovementRoll:null,
+   boss:null,
+   winner:null,pendingEquip:null,book:loadCollectionBook(),
+   worldEvents:[],
+   monsterTiles:[],
+   roads:[],
+   players:[0].map(i=>({
+     name:"🧙 Adventurer",
+     roadRegion:null,roadPos:0,roadPenalty:null,locationMode:"town",finalRoadPos:0,finalBossHits:0,
+     // position: region index is derived from progress; localSpace 0 means before space 1
+     position:0,
+     hp:12,maxHp:12,
+     equipment:{weapon:null,armour:null,accessory:null},
+     cards:[],townRegion:0,
+     potions:0,rerolls:0,keys:[false,false,false,false],tempAttack:[0,0,0,0],roadAttackPenalty:0,roadSlow:0,roadCap:0,accessoryUsed:{briar:[false,false,false,false],heartwood:[false,false,false,false]},accessoryUses:{},visitedEvents:[[],[],[],[]]
+   }))
+ };
+ G.worldEvents=G.regionOrder.map(()=>makeBoardEvents());
+ G.roads=G.regionOrder.map(()=>makeRoad());
+ G.monsterTiles=G.regionOrder.map((r,ri)=>{
+   const blocked=G.worldEvents[ri].map(e=>e.space);
+   const available=[];
+   for(let s=3;s<=18;s++) if(!blocked.includes(s)) available.push(s);
+   const tiles=[];
+   while(tiles.length<4 && available.length){
+     tiles.push(available.splice(Math.floor(Math.random()*available.length),1)[0]);
+   }
+   return tiles.sort((a,b)=>a-b);
+ });
+ $("fight").disabled=true;$("pass").disabled=true;$("end").disabled=true;$("roll").disabled=false;
+ hideMonsterCard();hide("boss");
+ render();
+ showMessage(`🌍 <b>New world generated.</b><br>${G.regionOrder.map((r,i)=>`${i+1}. ${REGIONS[r].icon} ${REGIONS[r].name}`).join(" → ")}<br><br><b>Your adventurer starts on the 🏘️ Town tile of Region 1.</b> Roll to enter the board.`);
+}
+
+function player(){return G.players[G.active];}
+function currentRegionIndex(p){
+ if(p.locationMode==="road" && p.roadRegion!==null) return p.roadRegion;
+ if(p.townRegion!==undefined) return Math.min(3,p.townRegion);
+ return 0;
+}
+
+function regionalBossDifficulty(regionIndex){
+  const regionBonus = [0, 0, 1, 2][regionIndex] ?? 0;
+  return 5 + regionBonus;
+}
+function localSpace(p){
+ if(p.locationMode==="town" || p.locationMode==="gate" || p.locationMode==="bossRoom" || p.locationMode==="road") return 0;
+ const base=currentRegionIndex(p)*20;
+ return Math.max(1,Math.min(20,p.position-base));
+}
+function attack(p=player()){return Math.max(0,equippedAttack(p)+(p.tempAttack[currentRegionIndex(p)]||0)-p.roadAttackPenalty);}
+function render(){
+ const p=player();
+ $("hp").textContent=`${p.hp}/${p.maxHp}`;
+ $("atk").textContent=`+${attack(p)}`;
+ $("cards").textContent=p.cards.length; if($("cardCountSmall")) $("cardCountSmall").textContent=p.cards.length;
+ $("potions").textContent=p.potions;$("key").textContent=p.keys[currentRegionIndex(p)]?"YES":"NO";$("tempAtk").textContent="+"+(p.tempAttack[currentRegionIndex(p)]||0);
+ $("equipment").innerHTML=
+ `⚔️ ${p.equipment.weapon?p.equipment.weapon.monster[5]+" "+p.equipment.weapon.monster[6]:"No Weapon"}<br>`+
+ `🛡️ ${p.equipment.armour?p.equipment.armour.monster[5]+" "+p.equipment.armour.monster[6]:"No Armour"}<br>`+
+ `💍 ${p.equipment.accessory?p.equipment.accessory.monster[5]+" "+p.equipment.accessory.monster[6]:"No Accessory"}`;
+ $("potion").disabled=!(p.potions>0 && p.hp<p.maxHp && G.phase!=="boss" && G.phase!=="encounter");
+ $("region").textContent=`${currentRegionIndex(p)+1}/4`;
+ $("pos").textContent=p.locationMode==="town"?"🏘️ TOWN":p.locationMode==="gate"?"🔒 SPACE 20 / GATE":p.locationMode==="bossRoom"?"👑 BOSS ROOM":p.locationMode==="victoryRoad"?"🏁 VICTORY ROAD":p.locationMode==="finalRoad"?`🐉 FINAL ROAD ${p.finalRoadPos}/10`:p.locationMode==="finalBoss"?"🐉 FINAL BOSS":p.locationMode==="road"?`☠️ ROAD ${p.roadPos}/6`:`${localSpace(p)}/20`;
+
+ $("players").innerHTML=`<span class="active">🧙 Adventurer · Region ${currentRegionIndex(p)+1} · ${p.locationMode==="town"?"🏘️ Town":p.locationMode==="gate"?"🔒 Space 20 / Gate":p.locationMode==="bossRoom"?"👑 Boss Room":p.locationMode==="victoryRoad"?"🏁 Victory Road":p.locationMode==="finalRoad"?`🐉 Final Road ${p.finalRoadPos}/10`:p.locationMode==="finalBoss"?"🐉 Final Boss":p.locationMode==="road"?`☠️ Road ${p.roadPos}/6`:"Space "+localSpace(p)}</span>`;
+
+ let html="";
+ G.regionOrder.forEach((regionId,ri)=>{
+   const region=REGIONS[regionId];
+   const isCurrent=ri===currentRegionIndex(p);
+   html+=`<div class="region ${isCurrent?"current":""}">
+     <div class="rh">
+       <div><b>${region.icon} Region ${ri+1}: ${region.name}</b><div class="small">20 spaces · Regional monster deck</div></div>
+       <div>${ri<currentRegionIndex(p)?"✅ CLEARED":ri===currentRegionIndex(p)?"📍 CURRENT":"🔒"} ${region.boss.icon} ${region.boss.name}</div>
+     </div>
+     <div class="townTile ${isCurrent&&localSpace(p)===0?"me":""}">
+       <b>🏘️ TOWN</b>
+       <span class="small">Region starting area</span>
+       ${isCurrent&&p.locationMode==="town"?'<span class="token">🧙</span>':""}
+     </div>
+     <div class="spaces">`;
+
+   for(let s=1;s<=20;s++){
+     let cls="space";
+     if(s===1)cls+=" start";
+     
+     const isMonsterTile=G.monsterTiles[ri].includes(s);
+     const event=G.worldEvents[ri].find(e=>e.space===s);
+     if(isMonsterTile)cls+=" enc";
+     if(s===20)cls+=" boss";
+     if(event)cls+=" event";
+     if(isCurrent&&localSpace(p)===s)cls+=" me";
+     let icon=s===20?"🔒":isMonsterTile?"👾":event?event.icon:"";
+     let token=isCurrent&&((p.locationMode==="board"&&localSpace(p)===s)||(p.locationMode==="gate"&&s===20))?'<span class="token">🧙</span>':"";
+     html+=`<div class="${cls}"><b>${s}</b><span class="icon">${icon}</span>${token}</div>`;
+   }
+   html+=`</div>
+   <div class="townTile ${isCurrent&&p.locationMode==="bossRoom"?"me":""}" style="border-color:#e11d48;background:#3b1725">
+     <b>👑 BOSS ROOM</b><span class="small">${region.boss.icon} ${region.boss.name}</span>
+     ${isCurrent&&p.locationMode==="bossRoom"?'<span class="token">🧙</span>':""}
+   </div>
+   <div class="box" style="margin-top:8px">🏘️ <b>Town</b> → Spaces 1–19 → 🔒 <b>Space 20: Boss Gate</b> → 👑 <b>Boss Room</b></div>`;
+   if(ri<3){
+     html+=`<div class="small" style="margin-top:8px"><b>☠️ ROAD OF DEFEAT</b> — only entered if the boss defeats you</div><div class="road">`;
+     G.roads[ri].forEach((rp,idx)=>{
+       const onRoad=p.locationMode==="road" && p.roadRegion===ri && p.roadPos===idx+1;
+       html+=`<div class="roadSpace ${onRoad?"me":""}"><b>${idx+1}. ${rp.icon}</b><br>${rp.name}${onRoad?'<span class="token">🧙</span>':""}</div>`;
+     });
+     html+=`</div><div class="small">→ 🏘️ Next Region Town</div>`;
+   }
+   html+=`</div>`;
+ });
+ html+=`<div class="region ${(p.locationMode==="victoryRoad"||p.locationMode==="finalRoad"||p.locationMode==="finalBoss")?"current":""}">
+   <div class="rh"><div><b>🏆 Final Region</b><div class="small">Victory Road · 10-space approach · Ancient Dragon</div></div><div>${(p.locationMode==="victoryRoad"||p.locationMode==="finalRoad"||p.locationMode==="finalBoss")?"📍 CURRENT":"🔒"}</div></div>
+   <div class="townTile ${p.locationMode==="victoryRoad"?"me":""}" style="border-color:#eab308;background:#3a3014">
+     <b>🏁 VICTORY ROAD</b><span class="small">Final-region starting point</span>
+     ${p.locationMode==="victoryRoad"?'<span class="token">🧙</span>':""}
+   </div>
+   <div class="spaces">`;
+ for(let s=1;s<=10;s++){
+   const onFinalRoad=p.locationMode==="finalRoad"&&p.finalRoadPos===s;
+   html+=`<div class="space ${onFinalRoad?"me":""}"><b>${s}</b>${onFinalRoad?'<span class="token">🧙</span>':""}</div>`;
+ }
+ html+=`</div>
+   <div class="townTile ${p.locationMode==="finalBoss"?"me":""}" style="border-color:#f59e0b;background:#3a2310;margin-top:5px">
+     <b>🐉 ANCIENT DRAGON</b><span class="small">Final Boss</span>
+     ${p.locationMode==="finalBoss"?'<span class="token">🧙</span>':""}
+   </div>
+ </div>`;
+ $("world").innerHTML=html;
+$("collection").innerHTML=p.cards.map(c=>
+   `<div class="cc">${c.monster[1]} <b>${c.monster[0]}</b><small>${c.rarity} · ${c.monster[5]} · ${c.monster[6]} ${p.equipment[lootSlot(c.monster)]===c?"· ✅ EQUIPPED":""}</small></div>`
+ ).join("") || `<div class="cc">No cards yet — optional encounters are your chance to get stronger.</div>`;
+}
+
+function showMessage(t){$("msg").innerHTML=t;}
+function hide(id){$(id).classList.add("hidden");}
+function show(id){$(id).classList.remove("hidden");}
+
+
+
+function rollFinalRoad(){
+ const p=player();
+ const base=d6();
+ const bonus=movementBonus(p);
+ const n=base+bonus;
+ $("dice").textContent=bonus?`🎲 ${base} + 💍1 = ${n}`:`🎲 ${n}`;
+ $("roll").disabled=true;
+ p.finalRoadPos+=n;
+ if(p.finalRoadPos>=10){
+   p.finalRoadPos=10;
+   p.locationMode="finalBoss";
+   G.phase="finalBoss";
+   render();
+   beginFinalBoss();
+   return;
+ }
+ $("end").disabled=false;
+ render();
+ showMessage(`🐉 <b>Final Boss Region</b><br>You rolled ${n} and moved to space ${p.finalRoadPos}/10.<br><br>Press <b>➡️ End Turn</b>.`);
+}
+
+function beginFinalBoss(){ setEncounterMode(false);
+ const p=player();
+ G.phase="finalBoss";
+ p.locationMode="finalBoss";
+ $("roll").disabled=true;
+ $("fight").disabled=false;
+ $("fight").textContent="🐉 Fight Final Boss";
+ $("pass").disabled=true;
+ $("retreat").disabled=true;
+ $("end").disabled=true;
+ $("boss").innerHTML=`
+   <div class="big">${FINAL_BOSS.icon}</div>
+   <b>FINAL BOSS</b>
+   <h2>${FINAL_BOSS.name}</h2>
+   <p>⚔️ Difficulty <b>${FINAL_BOSS.difficulty}</b> · ❤️ Damage <b>${FINAL_BOSS.damage}</b></p>
+   <p>Successful hits: <b>${p.finalBossHits}</b> / ${FINAL_BOSS.hitsRequired}</p>
+   <div class="box">🎲 Required roll: <b>${Math.max(1,FINAL_BOSS.difficulty-attack(p))}+</b><br>Land ${FINAL_BOSS.hitsRequired} successful attacks to win.</div>`;
+ show("boss");
+ showMessage(`🐉 <b>The Ancient Dragon awaits.</b><br>You need ${FINAL_BOSS.hitsRequired} successful hits to win the game.`);
+}
+
+function fightFinalBoss(){
+ const p=player();
+ if(G.phase!=="finalBoss")return;
+
+ const n=d6(),total=n+attack(p);
+ const ri=3;
+ const effect=equippedAccessoryEffect(p);
+ const accName=equippedAccessoryName(p);
+
+ $("dice").textContent=`🎲 ${n}`;
+
+ if(total>=FINAL_BOSS.difficulty){
+   p.finalBossHits++;
+
+   if(p.finalBossHits>=FINAL_BOSS.hitsRequired){
+     G.winner=p.name;
+     $("fight").disabled=true;$("roll").disabled=true;$("end").disabled=true;
+     hide("boss");
+     render();
+     showMessage(`🏆 <b>YOU WIN!</b><br>The Ancient Dragon has been defeated after ${FINAL_BOSS.hitsRequired} successful hits. You finished Monster Quest with ${p.cards.length} Monster Cards and ${p.hp}/${p.maxHp} HP.`);
+     return;
+   }
+
+   $("fight").disabled=true;$("end").disabled=false;
+   render();
+   showMessage(`🔥 <b>Successful hit!</b> ${n} + ${attack(p)} = ${total} against difficulty ${FINAL_BOSS.difficulty}. Dragon hits: ${p.finalBossHits}/${FINAL_BOSS.hitsRequired}.<br><br>Press <b>➡️ End Turn</b>.`);
+
+ }else{
+   let damage=FINAL_BOSS.damage;
+   let accessoryNote="";
+
+   if(canUseAccessoryOnce(p,ri) && /prevent all damage from one failed boss battle/i.test(effect)){
+     markAccessoryUsed(accName,ri,p);
+     damage=0;
+     accessoryNote=`💍 <b>${accName} activated.</b> The failed boss attack dealt 0 damage.<br>`;
+   }
+
+   p.hp-=damage;
+
+   if(p.hp<=0){
+     hide("boss");
+     resetRunAfterDeath();
+     return;
+   }
+
+   $("fight").disabled=true;$("end").disabled=false;
+   render();
+   showMessage(`${accessoryNote}🐉 <b>The Dragon strikes back!</b><br>${n} + ${attack(p)} = ${total}. You take ${damage} damage.<br><br>Press <b>➡️ End Turn</b>.`);
+ }
+}
+
+function endTurn(){
+ if(G.winner)return;
+ G.active=0;
+ const waitingAtGate=(G.phase==="atGate");
+ const onRoad=(G.phase==="road");
+ const atFinalBoss=(G.phase==="finalBoss");
+ const atVictoryRoad=(G.phase==="victoryRoad");
+ const onFinalRoad=(G.phase==="finalRoad");
+ if(!waitingAtGate&&!onRoad&&!atFinalBoss&&!atVictoryRoad&&!onFinalRoad)G.phase="move";
+ G.encounter=null;G.boss=null;
+ $("roll").disabled=(atFinalBoss?true:false);
+ if(atVictoryRoad||onFinalRoad)$("roll").disabled=false;
+ $("fight").disabled=atFinalBoss?false:true;
+ $("fight").textContent=atFinalBoss?"🐉 Fight Final Boss":"⚔️ Fight";
+ $("pass").disabled=true;
+ $("retreat").disabled=true;
+ $("end").disabled=true;
+ hideMonsterCard();hide("boss");
+ render();
+ showMessage(waitingAtGate
+   ? `🔒 <b>You are waiting at the Boss Gate.</b><br>Your one roll this turn is your gate attempt. Roll 5+ to enter.`
+   : onRoad
+   ? `☠️ <b>Road of Defeat.</b><br>Roll once to continue toward the next Town.`
+   : atVictoryRoad
+   ? `🏁 <b>Victory Road.</b><br>Your next roll begins the final route. Once you leave, there is no retreat.`
+   : onFinalRoad
+   ? `🐉 <b>Final Boss Region.</b><br>Roll once to continue along the road to the Ancient Dragon.`
+   : atFinalBoss
+   ? `🐉 <b>Final Boss battle.</b><br>Attack the Ancient Dragon.`
+   : `➡️ <b>Turn ended.</b><br>Roll to begin your next turn.`);
+}
+
+/* IMPORTANT: movement is now a pure position calculation.
+   position 0 is the start area; spaces are 1..20. */
+function rollToMove(){
+ if((G.phase!=="move"&&G.phase!=="atGate"&&G.phase!=="road"&&G.phase!=="victoryRoad"&&G.phase!=="finalRoad")||G.winner)return;
+ const p=player();
+
+ // Leaving Victory Road commits the player to the final route.
+ if(G.phase==="victoryRoad"){
+   p.locationMode="finalRoad";
+   p.finalRoadPos=0;
+   G.phase="finalRoad";
+   rollFinalRoad();
+   return;
+ }
+
+ // Final Boss Region uses normal one-roll-per-turn movement.
+ if(G.phase==="finalRoad"){
+   rollFinalRoad();
+   return;
+ }
+
+ // Road of Defeat uses the same one-roll-per-turn movement rule.
+ if(G.phase==="road"){
+   rollRoad();
+   return;
+ }
+
+ // If already waiting at the Boss Gate, this turn's one roll IS the gate roll.
+ if(G.phase==="atGate"){
+   const n=d6();
+   $("dice").textContent=`🎲 ${n}`;
+   $("roll").disabled=true;
+   if(n>=5){
+     $("retreat").disabled=true;
+     showMessage(`🔓 <b>Gate opened!</b> Your turn roll was ${n}, so you enter the boss room immediately.`);
+     beginBoss();
+     render();
+   }else{
+     $("retreat").disabled=false;$("end").disabled=false;
+     showMessage(`🔒 <b>Gate remains locked.</b> Your turn roll was ${n}; you need 5+.<br><br>Press <b>➡️ End Turn</b>. Next turn you can try once again.`);
+   }
+   return;
+ }
+ const pRegion=currentRegionIndex(p);
+ const baseRoll=d6();
+
+ if(canRerollMovement(p,pRegion)){
+   G.pendingMovementRoll={baseRoll,region:pRegion};
+   $("dice").textContent=`🎲 ${baseRoll}`;
+   $("roll").disabled=true;
+   showMessage(`💍 <b>${equippedAccessoryName(p)}</b><br>You rolled <b>${baseRoll}</b> for movement.<br><br>
+     <button onclick="rerollPendingMovement()">💍 Reroll Movement</button>
+     <button class="secondary" onclick="keepPendingMovement()">Keep ${baseRoll}</button>`);
+   return;
+ }
+
+ completeBoardMovement(baseRoll);
+}
+
+function rerollPendingMovement(){
+ const p=player(),pending=G.pendingMovementRoll;
+ if(!pending)return;
+ markAccessoryUsed(equippedAccessoryName(p),pending.region,p);
+ const oldRoll=pending.baseRoll;
+ const newRoll=d6();
+ G.pendingMovementRoll=null;
+ showMessage(`💍 <b>${equippedAccessoryName(p)} activated.</b><br>Movement roll ${oldRoll} was rerolled to <b>${newRoll}</b>.`);
+ completeBoardMovement(newRoll);
+}
+
+function keepPendingMovement(){
+ const pending=G.pendingMovementRoll;
+ if(!pending)return;
+ const roll=pending.baseRoll;
+ G.pendingMovementRoll=null;
+ completeBoardMovement(roll);
+}
+
+function completeBoardMovement(baseRoll){
+ const p=player();
+ const moveBonus=movementBonus(p);
+ const roll=baseRoll+moveBonus;
+ $("dice").textContent=moveBonus?`🎲 ${baseRoll} + 💍${moveBonus} = ${roll}`:`🎲 ${roll}`;
+ $("roll").disabled=true;
+
+ const region=currentRegionIndex(p);
+ const oldLocal=(p.locationMode==="town")?0:localSpace(p);
+ const newLocal=Math.min(20,oldLocal+roll);
+ p.position=region*20+newLocal;
+ p.locationMode="board";
+
+ render();
+
+ if(newLocal===20){
+   p.locationMode="gate";
+   beginBossGate();
+   render();
+   return;
+ }
+
+ if(G.monsterTiles[region].includes(newLocal)){
+   beginOptionalEncounter(drawFreshMonster(region));
+   return;
+ }
+
+ const event=G.worldEvents[region].find(e=>e.space===newLocal);
+ if(event){
+   if(event.type==="mystery"){
+     resolveBoardEvent(event,p,region);
+     return;
+   }
+   if(!p.visitedEvents[region].includes(event.space)){
+     p.visitedEvents[region].push(event.space);
+     resolveBoardEvent(event,p,region);
+     return;
+   }
+ }
+
+ $("roll").disabled=true;
+ $("fight").disabled=true;
+ $("pass").disabled=true;
+ $("retreat").disabled=true;
+ $("end").disabled=false;
+ showMessage(`You rolled <b>${roll}</b> and moved from ${oldLocal===0?"🏘️ Town":"space "+oldLocal} to <b>space ${newLocal}</b> of Region ${region+1}.<br><br>🎲 <b>Your movement roll is complete.</b><br>Press <b>➡️ End Turn</b> to continue.`);
+}
+
+
+function drawFreshMonster(region){
+
+  const regionData = REGIONS[G.regionOrder[region]];
+  const card = drawRegionMonster(regionData.name);
+
+  if(card){
+    let rarity = "COMMON";
+    if(card.rarity.includes("LEGENDARY")) rarity = "LEGENDARY";
+    else if(card.rarity.includes("UNCOMMON")) rarity = "UNCOMMON";
+    else if(card.rarity.includes("RARE")) rarity = "RARE";
+
+    const baseDifficulty = parseInt(card.roll);
+    const regionBonus = [0, 0, 1, 2][region] ?? 0;
+    const difficulty = baseDifficulty + regionBonus;
+    const damage = parseInt(card.damage);
+
+    let attackBonus = 0;
+    let hpBonus = 0;
+
+    const attackMatch = card.itemEffect.match(/\+(\d+)\s*Attack/i);
+    const hpMatch = card.itemEffect.match(/\+(\d+)\s*Max HP/i);
+
+    if(attackMatch) attackBonus = parseInt(attackMatch[1]);
+    if(hpMatch) hpBonus = parseInt(hpMatch[1]);
+
+    const legacyMonster = [
+      card.name,
+      "👾",
+      rarity,
+      difficulty,
+      damage,
+      card.itemName,
+      card.itemEffect,
+      attackBonus,
+      hpBonus,
+      card.itemType
+    ];
+
+    return {
+      monster: legacyMonster,
+      cardData: card,
+      rarity,
+      difficulty,
+      space: localSpace(player())
+    };
+  }
+
+  // Emergency fallback so landing on a monster tile can never lock the game.
+  const m = MONSTERS[Math.floor(Math.random()*MONSTERS.length)];
+  const rarity = chooseRarity();
+  const difficulty = {COMMON:3,UNCOMMON:4,RARE:5,LEGENDARY:6}[rarity];
+
+  console.warn("Using emergency monster fallback for region:", regionData.name);
+
+  return {
+    monster:m,
+    rarity,
+    difficulty,
+    space:localSpace(player())
+  };
+}
+
+function resolveBoardEvent(ev,p,region){
+ $("roll").disabled=true;$("end").disabled=false;
+ let text=`${ev.icon} <b>${ev.name}</b><br>`;
+ const effect=equippedAccessoryEffect(p);
+ const accName=equippedAccessoryName(p);
+
+ if(ev.type==="campfire"){
+   const heal=Math.min(4,p.maxHp-p.hp);p.hp+=heal;
+   text+=`You rest by the fire and recover <b>${heal} HP</b>.`;
+
+ }else if(ev.type==="treasure"){
+   if(Math.random()<0.6){
+     let gained=1;
+     if(/gain 1 extra potion from treasure chest events/i.test(effect)) gained++;
+     p.potions+=gained;
+     text+=`You found ${gained>1?"<b>2</b> 🧪 Health Potions":"a 🧪 <b>Health Potion</b>"}.`;
+     if(gained>1) text+=`<br>💍 <b>${accName}</b> granted 1 extra potion.`;
+   }else{
+     p.rerolls++;
+     text+=`You found a 🍀 <b>Lucky Charm</b>. A future combat reroll system can use this charge.`;
+   }
+
+ }else if(ev.type==="trap"){
+   let dmg=2;
+   let note="";
+
+   if(canUseAccessoryOnce(p,region) && /ignore (one trap event|all damage from one trap event)/i.test(effect)){
+     markAccessoryUsed(accName,region,p);
+     dmg=0;
+     note=`<br>💍 <b>${accName} activated.</b> The Trap was ignored.`;
+   }else if(canUseAccessoryOnce(p,region)){
+     const reduce=effect.match(/reduce trap damage by (\d+)/i);
+     if(reduce){
+       markAccessoryUsed(accName,region,p);
+       const amount=parseInt(reduce[1]);
+       dmg=Math.max(0,dmg-amount);
+       note=`<br>💍 <b>${accName} activated.</b> Trap damage was reduced by ${amount}.`;
+     }
+   }
+
+   p.hp-=dmg;
+   text+=dmg>0?`A trap springs! You take <b>${dmg} damage</b>.`:`A trap springs, but you take <b>0 damage</b>.`;
+   text+=note;
+   if(p.hp<=0){respawn(p);return}
+
+ }else if(ev.type==="shrine"){
+   p.tempAttack[region]=Math.max(p.tempAttack[region],1);
+   text+=`The shrine grants <b>+1 Attack</b> until you leave this region.`;
+
+ }else if(ev.type==="mystery"){
+   const roll=Math.floor(Math.random()*4);
+   text+=`A fresh random outcome is drawn...<br>`;
+   if(roll===0){p.hp=Math.min(p.maxHp,p.hp+5);text+=`Fortune smiles on you: recover <b>5 HP</b>.`}
+   else if(roll===1){p.potions++;text+=`You discover a hidden 🧪 <b>Health Potion</b>.`}
+   else if(roll===2){text+=`Ancient knowledge surges through you, but this prototype has no XP system, so no permanent stat is added.`}
+   else{p.hp-=2;text+=`Bad luck! You take <b>2 damage</b>.`;if(p.hp<=0){respawn(p);return}}
+ }
+ render();
+ showMessage(text+`<br><br>Press <b>➡️ End Turn</b> when ready.`);
+}
+
+function showEquipChoice(card,foundKey){
+ const p=player(),slot=lootSlot(card.monster),current=p.equipment[slot];
+ const slotName={weapon:"⚔️ Weapon",armour:"🛡️ Armour",accessory:"💍 Accessory"}[slot];
+ showMessage(`🏆 <b>${card.monster[0]} defeated!</b><br>
+ 🃏 Card collected.<br>
+ 🎁 <b>${card.monster[5]}</b> — ${card.monster[6]}<br>
+ ${foundKey?"🗝️ <b>Regional Key dropped!</b><br>":""}
+ ${card.accessoryNote?card.accessoryNote+"<br>":""}
+ <br><b>${slotName}</b><br>
+ Current: ${current?current.monster[5]+" — "+current.monster[6]:"Empty"}<br>
+ New: ${card.monster[5]} — ${card.monster[6]}<br><br>
+ <button onclick="equipPendingLoot()">Equip New Item</button>
+ <button class="secondary" onclick="keepCurrentLoot()">Keep Current</button>`);
+}
+function recalcEquipmentHp(p){
+ const oldMax=p.maxHp;
+ const newMax=12+equippedHp(p);
+ const difference=newMax-oldMax;
+ p.maxHp=newMax;
+ p.hp=Math.max(1,Math.min(p.maxHp,p.hp+difference));
+}
+function equipPendingLoot(){
+ const p=player(),card=G.pendingEquip;if(!card)return;
+ const slot=lootSlot(card.monster);
+ const oldAttack=attack(p);
+ const oldMaxHp=p.maxHp;
+ const oldItem=p.equipment[slot];
+
+ // Replace the slot outright. The previous item remains in the card collection,
+ // but contributes ZERO active stats.
+ p.equipment[slot]=card;
+
+ if(slot==="armour")recalcEquipmentHp(p);
+
+ const newAttack=attack(p);
+ const newMaxHp=p.maxHp;
+ G.pendingEquip=null;
+ $("end").disabled=false;
+ render();
+
+ const oldName=oldItem?oldItem.monster[5]:"None";
+ let statChange="";
+ if(slot==="weapon")statChange=`<br>⚔️ Total Attack: <b>${oldAttack} → ${newAttack}</b>`;
+ if(slot==="armour")statChange=`<br>❤️ Max HP: <b>${oldMaxHp} → ${newMaxHp}</b>`;
+
+ showMessage(`✅ <b>${card.monster[5]} equipped.</b><br>${oldName} is now inactive.${statChange}<br><br>Press <b>➡️ End Turn</b>.`);
+}
+function keepCurrentLoot(){
+ const card=G.pendingEquip;G.pendingEquip=null;$("end").disabled=false;render();
+ showMessage(`🃏 <b>${card.monster[5]}</b> stays in your card collection. Your current equipment remains active.<br><br>Press <b>➡️ End Turn</b>.`);
+}
+
+function usePotion(){
+ const p=player();
+ if(p.potions<=0||p.hp>=p.maxHp||G.phase==="boss"||G.phase==="encounter")return;
+ const heal=Math.min(5,p.maxHp-p.hp);p.hp+=heal;p.potions--;
+ render();showMessage(`🧪 <b>Health Potion used.</b> You recover ${heal} HP.`);
+}
+
+function beginOptionalEncounter(e){
+
+  if(!e || !e.monster){
+    G.phase="move";
+    $("roll").disabled=true;
+    $("fight").disabled=true;
+    $("pass").disabled=true;
+    $("end").disabled=false;
+    showMessage(`⚠️ <b>Monster encounter error.</b><br>No valid monster could be drawn for this region.<br><br>Press <b>➡️ End Turn</b>.`);
+    return;
+  }
+
+  const newlyDiscovered = discoverMonster(e.monster);
+
+  G.phase="encounter";
+  G.encounter=e;
+
+  if(e.cardData){
+    showMonsterCard(e.cardData);
+  } else {
+    hideMonsterCard();
+  }
+
+  $("roll").disabled=true;
+  $("fight").disabled=false;
+  $("pass").disabled=false;
+
+  showMessage(`${newlyDiscovered?`📖 <b>NEW MONSTER DISCOVERED!</b><br>${e.monster[0]} was added to your Collection Book.<br><br>`:""}👾 <b>${e.monster[0]}</b> appeared on your space. Fight or pass.`);
+}
+
+function fightOptional(){
+ if(G.phase!=="encounter")return;
+
+ const p=player(),e=G.encounter,ri=currentRegionIndex(p);
+ const effect=equippedAccessoryEffect(p);
+ const accName=equippedAccessoryName(p);
+
+ let roll=d6();
+ let total=roll+attack(p);
+ let accessoryNote="";
+
+ $("dice").textContent=`🎲 ${roll}`;
+
+ // Once-per-region reroll of a failed monster battle.
+ if(total<e.difficulty && canUseAccessoryOnce(p,ri) && /reroll (a )?failed monster battle/i.test(effect)){
+   markAccessoryUsed(accName,ri,p);
+   const firstRoll=roll;
+   roll=d6();
+   total=roll+attack(p);
+   $("dice").textContent=`🎲 ${firstRoll} → 💍 ${roll}`;
+   accessoryNote=`💍 <b>${accName} activated.</b> Failed roll ${firstRoll} was rerolled to ${roll}.`;
+ }
+
+ // Once-per-region bonus added only after a failed monster roll.
+ if(total<e.difficulty && canUseAccessoryOnce(p,ri)){
+   const bonusMatch=effect.match(/add \+(\d+) to a failed monster battle roll/i);
+   if(bonusMatch){
+     const bonus=parseInt(bonusMatch[1]);
+     markAccessoryUsed(accName,ri,p);
+     total+=bonus;
+     accessoryNote+=`${accessoryNote?"<br>":""}💍 <b>${accName} activated.</b> +${bonus} was added to the failed battle total.`;
+   }
+ }
+
+ // Once-per-region automatic success.
+ if(total<e.difficulty && canUseAccessoryOnce(p,ri) && /turn one failed monster battle into a success/i.test(effect)){
+   markAccessoryUsed(accName,ri,p);
+   total=e.difficulty;
+   accessoryNote+=`${accessoryNote?"<br>":""}💍 <b>${accName} activated.</b> The failed monster battle became a success.`;
+ }
+
+ if(total>=e.difficulty){
+   p.cards.push(e);
+   markMonsterDefeated(e.monster);
+
+   const keyChance=e.cardData ? parseInt(e.cardData.keyChance) :
+     {COMMON:10,UNCOMMON:20,RARE:35,LEGENDARY:60}[e.rarity];
+
+   const foundKey=!p.keys[ri] && Math.random()*100<keyChance;
+   if(foundKey)p.keys[ri]=true;
+
+   // Passive heal after defeating/successfully battling a monster.
+   const healMatch=effect.match(/heal \+?(\d+) hp after (successful monster battle|defeating a monster)/i);
+   if(healMatch){
+     const healAmount=parseInt(healMatch[1]);
+     const heal=Math.min(healAmount,p.maxHp-p.hp);
+     p.hp+=heal;
+     accessoryNote+=`${accessoryNote?"<br>":""}💍 <b>${accName} activated.</b> Recovered ${heal} HP.`;
+   }
+
+   e.accessoryNote=accessoryNote;
+   G.pendingEquip=e;
+   hideMonsterCard();G.encounter=null;G.phase="move";
+   $("roll").disabled=true;$("fight").disabled=true;$("pass").disabled=true;$("end").disabled=true;
+   render();
+   showEquipChoice(e,foundKey);
+
+ }else{
+   let damage=e.monster[4];
+
+   // Prevent or reduce failed-monster damage.
+   if(canUseAccessoryOnce(p,ri) && /prevent all damage from one failed monster battle/i.test(effect)){
+     markAccessoryUsed(accName,ri,p);
+     damage=0;
+     accessoryNote+=`${accessoryNote?"<br>":""}💍 <b>${accName} activated.</b> All failed-battle damage was prevented.`;
+   }else if(canUseAccessoryOnce(p,ri)){
+     let reduceMatch=effect.match(/(?:prevent|reduce) (\d+) damage from a failed monster battle/i);
+     if(!reduceMatch) reduceMatch=effect.match(/reduce damage from a failed monster battle by (\d+)/i);
+     if(!reduceMatch) reduceMatch=effect.match(/reduce monster damage by (\d+)/i);
+     if(reduceMatch){
+       const amount=parseInt(reduceMatch[1]);
+       markAccessoryUsed(accName,ri,p);
+       damage=Math.max(0,damage-amount);
+       accessoryNote+=`${accessoryNote?"<br>":""}💍 <b>${accName} activated.</b> Damage reduced by ${amount}.`;
+     }
+   }
+
+   p.hp-=damage;
+
+   // Heal after a failed monster battle.
+   if(canUseAccessoryOnce(p,ri)){
+     const failHeal=effect.match(/heal (\d+) hp after a failed monster battle/i);
+     if(failHeal){
+       markAccessoryUsed(accName,ri,p);
+       const healAmount=parseInt(failHeal[1]);
+       const before=p.hp;
+       p.hp=Math.min(p.maxHp,p.hp+healAmount);
+       accessoryNote+=`${accessoryNote?"<br>":""}💍 <b>${accName} activated.</b> Recovered ${p.hp-before} HP after the failed battle.`;
+     }
+   }
+
+   // Lethal monster-damage saves.
+   if(p.hp<=0 && canUseAccessoryOnce(p,ri)){
+     if(/survive lethal monster damage at 1 hp/i.test(effect)){
+       markAccessoryUsed(accName,ri,p);
+       p.hp=1;
+       accessoryNote+=`${accessoryNote?"<br>":""}💍 <b>${accName} activated.</b> You survived at 1 HP.`;
+     }else{
+       const revive=effect.match(/revive at (\d+) hp after taking lethal monster damage/i);
+       if(revive){
+         markAccessoryUsed(accName,ri,p);
+         p.hp=Math.min(p.maxHp,parseInt(revive[1]));
+         accessoryNote+=`${accessoryNote?"<br>":""}💍 <b>${accName} activated.</b> You revived at ${p.hp} HP.`;
+       }
+     }
+   }
+
+   hideMonsterCard();G.encounter=null;G.phase="move";
+   $("roll").disabled=true;$("fight").disabled=true;$("pass").disabled=true;$("end").disabled=false;
+
+   if(p.hp<=0)respawn(p);
+   else{
+     render();
+     showMessage(`${accessoryNote?accessoryNote+"<br>":""}💥 <b>You lost to ${e.monster[0]}.</b> You take ${damage} damage.<br><br>Press <b>➡️ End Turn</b> when ready.`);
+     $("end").disabled=false;
+   }
+ }
+}
+
+function passEncounter(){
+ if(G.phase!=="encounter")return;
+ G.encounter=null;G.phase="move";
+ hideMonsterCard();$("roll").disabled=true;$("fight").disabled=true;$("pass").disabled=true;$("end").disabled=false;
+ render();showMessage(`You passed the optional encounter. No damage, no reward.<br><br>Press <b>➡️ End Turn</b> when ready.`);
+}
+
+
+
+function enterRoadOfDefeat(region){
+ const p=player();
+ p.roadRegion=region;p.roadPos=0;p.roadPenalty=null;
+ p.locationMode="road";
+ G.phase="road";
+ $("roll").disabled=true;$("fight").disabled=true;$("pass").disabled=true;$("retreat").disabled=true;$("end").disabled=false;
+ render();
+ showMessage(`💀 <b>Boss defeated you.</b><br>You have cleared the region, but must cross the ☠️ <b>Road of Defeat</b> before reaching the next Town.<br><br>Press <b>➡️ End Turn</b>.`);
+}
+
+function rollRoad(){
+ const p=player(),ri=p.roadRegion;
+ const base=d6();
+ const bonus=movementBonus(p);
+ let n=base+bonus;
+ if(p.roadSlow){n=Math.max(1,n-p.roadSlow);p.roadSlow=0}
+ if(p.roadCap){n=Math.min(n,p.roadCap);p.roadCap=0}
+ $("dice").textContent=bonus?`🎲 ${base} + 💍1 = ${n}`:`🎲 ${n}`;
+ $("roll").disabled=true;
+ p.roadPos+=n;
+ if(p.roadPos>=7){
+   finishRoad();
+   return;
+ }
+ const penalty=G.roads[ri][p.roadPos-1];
+ applyRoadPenalty(p,penalty);
+}
+
+function applyRoadPenalty(p,penalty){
+ let extra="";
+ if(penalty.type==="damage"){
+   p.hp-=penalty.value;
+   if(p.hp<=0){p.hp=1;extra="<br>☠️ The Road cannot kill you; you cling to life at <b>1 HP</b>."}
+ }else if(penalty.type==="attack"){
+   p.roadAttackPenalty=Math.max(p.roadAttackPenalty,penalty.value);
+ }else if(penalty.type==="potion"){
+   if(p.potions>0)p.potions--; else extra="<br>You had no potion to lose.";
+ }else if(penalty.type==="slow"){
+   p.roadSlow=penalty.value;
+ }else if(penalty.type==="cap"){
+   p.roadCap=penalty.value;
+ }else if(penalty.type==="discard"){
+   if(p.cards.length){
+     p.roadPenalty=penalty;
+     G.phase="roadDiscard";
+     renderDiscardChoice();
+     return;
+   } else extra="<br>You have no Monster Cards to sacrifice.";
+ }
+ $("end").disabled=false;
+ render();
+ showMessage(`${penalty.icon} <b>${penalty.name}</b><br>${penalty.desc}.${extra}<br><br>Press <b>➡️ End Turn</b>.`);
+}
+
+function renderDiscardChoice(){
+ const p=player();
+ $("roll").disabled=true;$("end").disabled=true;
+ const choices=p.cards.map((c,i)=>`<button class="secondary" onclick="discardRoadCard(${i})">${c.monster[1]} ${c.monster[0]} — ${c.monster[5]}</button>`).join(" ");
+ showMessage(`🃏 <b>Sacrifice</b><br>Choose one collected Monster Card to discard. Its equipment bonus will also be removed.<br><br><div class="buttons">${choices}</div>`);
+}
+
+function discardRoadCard(i){
+ const p=player(),c=p.cards[i];
+ if(!c)return;
+ const slot=lootSlot(c.monster);
+ if(p.equipment[slot]===c)p.equipment[slot]=null;
+ p.cards.splice(i,1);
+ if(slot==="armour")recalcEquipmentHp(p);
+ p.roadPenalty=null;G.phase="road";
+ $("end").disabled=false;
+ render();
+ showMessage(`🃏 <b>${c.monster[0]} discarded.</b><br>You lose the ${c.monster[5]} bonus.<br><br>Press <b>➡️ End Turn</b>.`);
+}
+
+function finishRoad(){
+ const p=player(),next=p.roadRegion+1;
+ p.roadRegion=null;p.roadPos=0;clearRoadPenalties(p);
+ p.position=next*20;p.townRegion=next;
+ p.locationMode="town";
+ G.phase="move";
+ $("roll").disabled=true;$("end").disabled=false;
+ render();
+ showMessage(`🏘️ <b>You survived the Road of Defeat.</b><br>You arrive at the Town of Region ${next+1}. Temporary Road penalties are cleared.<br><br>Press <b>➡️ End Turn</b>.`);
+}
+
+function beginBossGate(){
+ const p=player(),ri=currentRegionIndex(p);
+ p.locationMode="gate";
+ G.phase="gate";
+ $("roll").disabled=true;$("pass").disabled=true;$("end").disabled=true;
+ if(p.keys[ri]){
+   G.phase="gateChoiceKey";
+   $("roll").disabled=true;$("fight").disabled=false;$("pass").disabled=true;$("retreat").disabled=false;
+   $("fight").textContent="🔓 Enter Boss Room";
+   G.boss={gate:true};
+   $("boss").innerHTML=`
+     <div class="big">🗝️</div><b>BOSS GATE</b>
+     <h2>Regional Key Ready</h2>
+     <p>Your Regional Key will open this gate automatically.</p>
+     <div class="box">Choose to enter the boss room now, or return to Town and keep the key for later.</div>`;
+   show("boss");
+   showMessage(`🗝️ <b>You have the Regional Key.</b><br>Enter the boss room now, or return to Town to prepare more.`);
+   return;
+ }
+ $("fight").disabled=false;$("retreat").disabled=false;
+ $("fight").textContent="🔒 Roll Gate (Need 5+)";
+ G.boss={gate:true};
+ $("boss").innerHTML=`
+   <div class="big">🔒</div><b>BOSS GATE</b>
+   <h2>Locked Entrance</h2>
+   <p>You do not have the 🗝️ Regional Key.</p>
+   <div class="box">🎲 Roll <b>5+</b> to force the gate open.<br>Success: enter the boss room.<br>Failure: remain at the gate and end your turn.</div>`;
+ show("boss");
+ showMessage(`🔒 The boss room is locked. You need a <b>5+</b> gate roll because you do not have a key.`);
+}
+
+
+function enterBossWithKey(){
+ const p=player(),ri=currentRegionIndex(p);
+ if(G.phase!=="gateChoiceKey"||!p.keys[ri])return;
+ p.keys[ri]=false;
+ hide("boss");$("retreat").disabled=true;$("fight").textContent="⚔️ Fight";
+ showMessage(`🔓 <b>Regional Key used.</b> The gate opens and the key is consumed.`);
+ beginBoss();
+ render();
+}
+
+function returnToTown(){
+ const p=player(),ri=currentRegionIndex(p);
+ if(!["gate","gateChoiceKey","atGate"].includes(G.phase))return;
+ p.position=ri*20;
+ p.townRegion=ri;
+ p.locationMode="town";
+ clearRoadPenalties(p);
+ G.phase="move";
+ hide("boss");
+ $("roll").disabled=true;
+ $("fight").disabled=true;
+ $("pass").disabled=true;
+ $("retreat").disabled=true;
+ $("end").disabled=false;
+ $("fight").textContent="⚔️ Fight";
+ render();
+ showMessage(`🏘️ <b>You return to Town.</b><br>You keep your HP, cards, loot,  levels${p.keys[ri]?", and your 🗝️ Regional Key":""}.<br><br>Press <b>➡️ End Turn</b>.`);
+}
+
+function rollBossGate(){
+ const n=d6();$("dice").textContent=`🎲 ${n}`;
+ if(n>=5){
+   hide("boss");$("retreat").disabled=true;$("fight").textContent="⚔️ Fight";showMessage(`🔓 <b>Gate opened!</b> You rolled ${n}.`);
+   beginBoss();
+   render();
+ }else{
+   G.phase="atGate";$("fight").disabled=true;$("fight").textContent="⚔️ Fight";$("end").disabled=false;
+   showMessage(`🔒 <b>Gate roll failed.</b> You rolled ${n}; you needed 5+. You remain at the gate.<br><br>Press <b>➡️ End Turn</b>. On your next turn, your single dice roll will be the gate attempt.`);
+ }
+}
+
+function beginBoss(){ setEncounterMode(false);
+ const p=player(),ri=currentRegionIndex(p),region=REGIONS[G.regionOrder[ri]],b=region.boss;
+ const bossDifficulty=regionalBossDifficulty(ri);
+
+ p.locationMode="bossRoom";
+ G.phase="boss";
+ G.boss={...b,scaledDifficulty:bossDifficulty};
+
+ $("fight").textContent="⚔️ Fight";
+ $("roll").disabled=true;
+ $("fight").disabled=false;
+ $("pass").disabled=true;
+ $("retreat").disabled=true;
+
+ $("boss").innerHTML=`
+   <div class="big">${b.icon}</div>
+   <b>👑 REGIONAL BOSS</b>
+   <h2>${b.name}</h2>
+   <p>⚔️ Difficulty <b>${bossDifficulty}</b> · ❤️ Damage <b>${b.damage}</b></p>
+   <div class="box">
+     🎲 <b>Required roll: ${Math.max(1,bossDifficulty-attack(p))}+</b><br>
+     ⚔️ Your Attack: <b>+${attack(p)}</b><br>
+     <span class="small">Base boss difficulty is 5. Region position bonus: <b>+${[0,0,1,2][ri] ?? 0}</b>.</span>
+   </div>
+   <div class="box">🏆 <b>Boss Reward:</b> Progression to the next area</div>
+   <p class="small">Mandatory battle. You cannot leave Region ${ri+1} until this boss is defeated.</p>`;
+
+ show("boss");
+ showMessage(`👑 <b>${b.name}</b> blocks the exit of Region ${ri+1}. Fight the boss.`);
+}
+
+function fightBoss(){
+ if(G.phase!=="boss")return;
+ const p=player(),b=G.boss,roll=d6(),total=roll+attack(p),ri=currentRegionIndex(p);
+ const bossDifficulty=b.scaledDifficulty ?? regionalBossDifficulty(ri);
+ const effect=equippedAccessoryEffect(p);
+ const accName=equippedAccessoryName(p);
+ $("dice").textContent=`🎲 ${roll}`;
+
+ if(total>=bossDifficulty){
+   p.keys[ri]=false;
+   p.tempAttack[ri]=0;
+   hide("boss");$("fight").disabled=true;$("roll").disabled=true;$("end").disabled=false;
+
+   if(ri===3){
+     p.locationMode="victoryRoad";
+     p.finalRoadPos=0;
+     p.finalBossHits=0;
+     G.phase="victoryRoad";
+     $("roll").disabled=true;
+     $("fight").disabled=true;
+     $("pass").disabled=true;
+     $("retreat").disabled=true;
+     $("end").disabled=false;
+     render();
+     showMessage(`🏆 <b>Region 4 boss defeated!</b><br>You arrive at 🏁 <b>Victory Road</b>.<br><br>Press <b>➡️ End Turn</b>.`);
+     return;
+   }
+
+   const nextRegion=ri+1;
+   p.position=nextRegion*20;
+   p.townRegion=nextRegion;
+   p.locationMode="town";
+   p.roadRegion=null;
+   p.roadPos=0;
+   clearRoadPenalties(p);
+   G.phase="move";
+   $("roll").disabled=true;$("fight").disabled=true;$("pass").disabled=true;$("retreat").disabled=true;$("end").disabled=false;
+   render();
+   showMessage(`🏆 <b>${b.name} defeated!</b><br>${roll} + ${attack(p)} = ${total} against difficulty ${bossDifficulty}.<br>You moved to the 🏘️ <b>Town of Region ${nextRegion+1}</b>.<br><br>Press <b>➡️ End Turn</b>.`);
+
+ }else{
+   let bossDamage=b.damage;
+   let accessoryNote="";
+
+   if(canUseAccessoryOnce(p,ri) && /prevent all damage from one failed boss battle/i.test(effect)){
+     markAccessoryUsed(accName,ri,p);
+     bossDamage=0;
+     accessoryNote=`💍 <b>${accName} activated.</b> All damage from the failed boss battle was prevented.<br>`;
+   }
+
+   p.hp-=bossDamage;
+   p.tempAttack[ri]=0;
+   hide("boss");$("fight").disabled=true;$("roll").disabled=true;$("retreat").disabled=true;
+
+   if(p.hp<=0){
+     resetRunAfterDeath();
+     return;
+   }
+
+   if(ri<3){
+     enterRoadOfDefeat(ri);
+     if(accessoryNote) showMessage(accessoryNote+`💀 <b>${b.name} defeated you.</b><br>You must cross the Road of Defeat.`);
+     return;
+   }
+
+   p.position=ri*20;p.townRegion=ri;p.locationMode="town";G.phase="move";
+   $("end").disabled=false;render();
+   showMessage(`${accessoryNote}💥 <b>${b.name} defeated you.</b><br>You return to Town.<br><br>Press <b>➡️ End Turn</b>.`);
+ }
+}
+
+function resetRunAfterDeath(){
+  // Death resets the player's run but keeps the SAME generated board/world.
+  const savedBook=loadCollectionBook();
+
+  G.active=0;
+  G.phase="move";
+  G.encounter=null;
+  G.pendingMovementRoll=null;
+  G.boss=null;
+  G.winner=null;
+  G.pendingEquip=null;
+  G.book=savedBook;
+
+  // Keep these world-generation values exactly as they are:
+  // G.regionOrder
+  // G.worldEvents
+  // G.monsterTiles
+  // G.roads
+
+  G.players=[{
+    name:"🧙 Adventurer",
+    roadRegion:null,
+    roadPos:0,
+    roadPenalty:null,
+    locationMode:"town",
+    finalRoadPos:0,
+    finalBossHits:0,
+    position:0,
+    hp:12,
+    maxHp:12,
+    equipment:{weapon:null,armour:null,accessory:null},
+    cards:[],
+    townRegion:0,
+    potions:0,
+    rerolls:0,
+    keys:[false,false,false,false],
+    tempAttack:[0,0,0,0],
+    roadAttackPenalty:0,
+    roadSlow:0,
+    roadCap:0,
+    accessoryUsed:{
+      briar:[false,false,false,false],
+      heartwood:[false,false,false,false]
+    },
+    accessoryUses:{},
+    visitedEvents:[[],[],[],[]]
+  }];
+
+  $("fight").disabled=true;
+  $("fight").textContent="⚔️ Fight";
+  $("pass").disabled=true;
+  $("retreat").disabled=true;
+  $("potion").disabled=true;
+  $("end").disabled=true;
+  $("roll").disabled=false;
+
+  hideMonsterCard();
+  hide("boss");
+
+  $("startScreen").style.display="none";
+  $("bookScreen").style.display="none";
+  $("gameShell").classList.remove("hiddenGame");
+
+  render();
+
+  showMessage(`💀 <b>You died.</b><br>Your run has restarted at the 🏘️ <b>Region 1 Town</b>.<br><br>The same generated world remains in place, but your current-run cards, equipment, keys, potions and temporary bonuses have been reset.`);
+}
+
+function respawn(p){
+  resetRunAfterDeath();
+}
+
+$("roll").onclick=rollToMove;
+$("fight").onclick=()=>G.phase==="encounter"?fightOptional():G.phase==="gateChoiceKey"?enterBossWithKey():G.phase==="gate"?rollBossGate():G.phase==="finalBoss"?fightFinalBoss():fightBoss();
+$("pass").onclick=passEncounter;
+$("retreat").onclick=returnToTown;
+$("potion").onclick=usePotion;
+$("end").onclick=endTurn;
+$("new").onclick=newGame;
+$("menu").onclick=showStartScreen;
+
+function renderMenuBook(){
+ const book=loadCollectionBook();
+ const cards=allCardMonsters();
+
+ const discovered=cards.filter(card=>book[cardMonsterBookId(card)]).length;
+ const defeated=cards.filter(card=>{
+   const e=book[cardMonsterBookId(card)];
+   return e&&e.defeated;
+ }).length;
+
+ $("menuBookProgress").textContent=`${discovered}/${cards.length} discovered · ${defeated}/${cards.length} defeated`;
+
+ $("menuBook").innerHTML=cards.map(card=>{
+   const id=cardMonsterBookId(card);
+   const e=book[id];
+   const regionLabel=card.region || "UNKNOWN REGION";
+
+   if(!e){
+     return `<div class="bookCard">
+       <div class="bookArt"><div class="bookUnknown">❓</div></div>
+       <div class="bookRegion">${regionLabel}</div>
+       <b>Undiscovered Monster</b>
+       <small>Encounter this monster during a run to reveal it.</small>
+     </div>`;
+   }
+
+   return `<div class="bookCard">
+     <div class="bookArt"><img src="${card.image}" alt="${card.name}"></div>
+     <div class="bookRegion">${regionLabel}</div>
+     <div class="bookRarity">${card.rarity}</div>
+     <b>${card.name}</b>
+     <small>
+       ${e.defeated?"🏆 Defeated":"👁️ Encountered"}<br>
+       ${e.defeated
+         ? `${card.itemType} · ${card.itemName}<br>${card.itemEffect}`
+         : "Loot hidden until defeated"}
+     </small>
+   </div>`;
+ }).join("");
+}
+function showStartScreen(){
+ $("startScreen").style.display="flex";
+ $("bookScreen").style.display="none";
+ $("gameShell").classList.add("hiddenGame");
+ renderMenuBook();
+}
+$("startGameBtn").onclick=()=>{
+ newGame();
+ $("startScreen").style.display="none";
+ $("bookScreen").style.display="none";
+ $("gameShell").classList.remove("hiddenGame");
+};
+$("openBookBtn").onclick=()=>{
+ $("startScreen").style.display="none";
+ $("bookScreen").style.display="block";
+ renderMenuBook();
+};
+$("closeBookBtn").onclick=showStartScreen;
+$("menuResetBook").onclick=()=>{
+ if(confirm("Reset all Collection Book discoveries?")){
+   try{localStorage.removeItem(BOOK_STORAGE_KEY)}catch(e){}
+   if(typeof G!=="undefined"&&G)G.book={};
+   renderMenuBook();
+ }
+};
+
+const CARD_MONSTERS = {
+
+  goblinScout: {
+    region: "🌲 WHISPERING WOODS",
+    name: "GOBLIN SCOUT",
+    rarity: "● COMMON",
+    image: "images/whispering-woods/goblin-scout.png",
+    roll: "3+",
+    damage: "2",
+    keyChance: "10%",
+    itemType: "WEAPON",
+    itemName: "Crude Dagger",
+    itemEffect: "⚔️ +1 Attack"
+  },
+
+  giantBrambleRat: {
+    region: "🌲 WHISPERING WOODS",
+    name: "GIANT BRAMBLE RAT",
+    rarity: "● COMMON",
+    image: "images/whispering-woods/giant-bramble-rat.png",
+    roll: "3+",
+    damage: "1",
+    keyChance: "10%",
+    itemType: "ARMOUR",
+    itemName: "Bramblehide Vest",
+    itemEffect: "❤️ +2 Max HP"
+  },
+
+   webwoodSpider: {
+    region: "🌲 WHISPERING WOODS",
+    name: "WEBWOOD SPIDER",
+    rarity: "● COMMON",
+    image: "images/whispering-woods/webwood-spider.png",
+    roll: "3+",
+    damage: "2",
+    keyChance: "10%",
+    itemType: "ACCESSORY",
+    itemName: "Silkweave Charm",
+    itemEffect: "+1 movement on all dice rolls"
+
+
+  },
+
+direWolf: {
+    region: "🌲 WHISPERING WOODS",
+    name: "DIRE WOLF",
+    rarity: "● UNCOMMON",
+    image: "images/whispering-woods/dire-wolf.png",
+    roll: "4+",
+    damage: "3",
+    keyChance: "20%",
+    itemType: "WEAPON",
+    itemName: "Wolf Fang Blade",
+    itemEffect: "+2 Attack"
+},
+
+goblinhuntsman: {
+region: "🌲 WHISPERING WOODS",
+    name: "GOBLIN HUNTSMAN",
+    rarity: "● UNCOMMON",
+    image: "images/whispering-woods/goblin-huntsman.png",
+    roll: "4+",
+    damage: "4",
+    keyChance: "20%",
+    itemType: "ARMOUR",
+    itemName: "Hunstman's Leather",
+    itemEffect: "+2 Max HP"
+},
+
+fungalbrute: {
+region: "🌲 WHISPERING WOODS",
+    name: "FUNGAL BRUTE",
+    rarity: "● UNCOMMON",
+    image: "images/whispering-woods/fungal-brute.png",
+    roll: "4+",
+    damage: "3",
+    keyChance: "20%",
+    itemType: "ACCESSORY",
+    itemName: "Spore Charm",
+    itemEffect: "Heal +1 HP after successful monster battle"
+},
+
+mossbacktroll: {
+region: "🌲 WHISPERING WOODS",
+    name: "MOSSBACK TROLL",
+    rarity: "● RARE",
+    image: "images/whispering-woods/mossback-troll.png",
+    roll: "5+",
+    damage: "4",
+    keyChance: "30%",
+    itemType: "ARMOUR",
+    itemName: "Trollhide Armour",
+    itemEffect: "+3 Max HP"
+},
+
+briarwitch: {
+region: "🌲 WHISPERING WOODS",
+    name: "BRIAR WITCH",
+    rarity: "● RARE",
+    image: "images/whispering-woods/briar-witch.png",
+    roll: "5+",
+    damage: "4",
+    keyChance: "30%",
+    itemType: "ACCESSORY",
+    itemName: "Briar Amulet",
+    itemEffect: "Once per region, reroll failed monster battle"
+},
+
+corruptedstag: {
+region: "🌲 WHISPERING WOODS",
+    name: "CORRUPTED STAG",
+    rarity: "● RARE",
+    image: "images/whispering-woods/corrupted-stag.png",
+    roll: "5+",
+    damage: "3",
+    keyChance: "30%",
+    itemType: "WEAPON",
+    itemName: "Thorned Antler",
+    itemEffect: "+3 Attack"
+},
+
+elderwoodguardian: {
+region: "🌲 WHISPERING WOODS",
+    name: "ELDERWOOD GUARDIAN",
+    rarity: "● LEGENDARY",
+    image: "images/whispering-woods/elderwood-guardian.png",
+    roll: "6+",
+    damage: "5",
+    keyChance: "50%",
+    itemType: "ACCESSORY",
+    itemName: "Heartwood Talisman",
+    itemEffect: "Once per region, prevent all damage from one failed monster battle"
+},
+
+duneScarab: {
+  region: "🏜️ SUNSCORCH SANDS",
+  name: "DUNE SCARAB",
+  rarity: "● COMMON",
+  image: "images/sunscorch-sands/dune-scarab.png",
+  roll: "3+",
+  damage: "1",
+  keyChance: "10%",
+  itemType: "ARMOUR",
+  itemName: "Scarab Shell",
+  itemEffect: "❤️ +1 Max HP"
+},
+
+sandJackal: {
+  region: "🏜️ SUNSCORCH SANDS",
+  name: "SAND JACKAL",
+  rarity: "● COMMON",
+  image: "images/sunscorch-sands/sand-jackal.png",
+  roll: "3+",
+  damage: "2",
+  keyChance: "10%",
+  itemType: "WEAPON",
+  itemName: "Jackal Fang",
+  itemEffect: "⚔️ +1 Attack"
+},
+
+desertBandit: {
+  region: "🏜️ SUNSCORCH SANDS",
+  name: "DESERT BANDIT",
+  rarity: "● COMMON",
+  image: "images/sunscorch-sands/desert-bandit.png",
+  roll: "3+",
+  damage: "2",
+  keyChance: "10%",
+  itemType: "ACCESSORY",
+  itemName: "Bandit's Coin",
+  itemEffect: "Gain 1 extra potion from Treasure Chest events"
+},
+
+giantScorpion: {
+  region: "🏜️ SUNSCORCH SANDS",
+  name: "GIANT SCORPION",
+  rarity: "● UNCOMMON",
+  image: "images/sunscorch-sands/giant-scorpion.png",
+  roll: "4+",
+  damage: "3",
+  keyChance: "20%",
+  itemType: "WEAPON",
+  itemName: "Scorpion Stinger",
+  itemEffect: "⚔️ +2 Attack"
+},
+
+sandscaleLizard: {
+  region: "🏜️ SUNSCORCH SANDS",
+  name: "SANDSCALE LIZARD",
+  rarity: "● UNCOMMON",
+  image: "images/sunscorch-sands/sandscale-lizard.png",
+  roll: "4+",
+  damage: "3",
+  keyChance: "20%",
+  itemType: "ARMOUR",
+  itemName: "Sandscale Hide",
+  itemEffect: "❤️ +2 Max HP"
+},
+
+tombRaider: {
+  region: "🏜️ SUNSCORCH SANDS",
+  name: "TOMB RAIDER",
+  rarity: "● UNCOMMON",
+  image: "images/sunscorch-sands/tomb-raider.png",
+  roll: "4+",
+  damage: "3",
+  keyChance: "20%",
+  itemType: "ACCESSORY",
+  itemName: "Relic Compass",
+  itemEffect: "Once per region, ignore one Trap event"
+},
+
+mummifiedGuardian: {
+  region: "🏜️ SUNSCORCH SANDS",
+  name: "MUMMIFIED GUARDIAN",
+  rarity: "● RARE",
+  image: "images/sunscorch-sands/mummified-guardian.png",
+  roll: "5+",
+  damage: "4",
+  keyChance: "30%",
+  itemType: "ARMOUR",
+  itemName: "Guardian Wraps",
+  itemEffect: "❤️ +3 Max HP"
+},
+
+duneStalker: {
+  region: "🏜️ SUNSCORCH SANDS",
+  name: "DUNE STALKER",
+  rarity: "● RARE",
+  image: "images/sunscorch-sands/dune-stalker.png",
+  roll: "5+",
+  damage: "4",
+  keyChance: "30%",
+  itemType: "WEAPON",
+  itemName: "Stalker's Claw",
+  itemEffect: "⚔️ +3 Attack"
+},
+
+sandDjinn: {
+  region: "🏜️ SUNSCORCH SANDS",
+  name: "SAND DJINN",
+  rarity: "● RARE",
+  image: "images/sunscorch-sands/sand-djinn.png",
+  roll: "5+",
+  damage: "4",
+  keyChance: "30%",
+  itemType: "ACCESSORY",
+  itemName: "Djinn's Hourglass",
+  itemEffect: "Once per region, add +2 to a failed monster battle roll"
+},
+
+colossalSandworm: {
+  region: "🏜️ SUNSCORCH SANDS",
+  name: "COLOSSAL SANDWORM",
+  rarity: "● LEGENDARY",
+  image: "images/sunscorch-sands/colossal-sandworm.png",
+  roll: "6+",
+  damage: "6",
+  keyChance: "50%",
+  itemType: "ACCESSORY",
+  itemName: "Sandworm Heart",
+  itemEffect: "Once per region, survive lethal monster damage at 1 HP"
+},
+
+evilSnowman: {
+  region: "❄️ FROSTPEAK MOUNTAINS",
+  name: "EVIL SNOWMAN",
+  rarity: "● COMMON",
+  image: "images/frostpeak-mountains/evil-snowman.png",
+  roll: "3+",
+  damage: "2",
+  keyChance: "10%",
+  itemType: "ARMOUR",
+  itemName: "Packed Snow Mantle",
+  itemEffect: "❤️ +1 Max HP"
+},
+
+iceSorcerer: {
+  region: "❄️ FROSTPEAK MOUNTAINS",
+  name: "ICE SORCERER",
+  rarity: "● COMMON",
+  image: "images/frostpeak-mountains/ice-sorcerer.png",
+  roll: "3+",
+  damage: "2",
+  keyChance: "10%",
+  itemType: "ACCESSORY",
+  itemName: "Frozen Rune",
+  itemEffect: "Once per region, reduce monster damage by 1"
+},
+
+frostBat: {
+  region: "❄️ FROSTPEAK MOUNTAINS",
+  name: "FROST BAT",
+  rarity: "● COMMON",
+  image: "images/frostpeak-mountains/frost-bat.png",
+  roll: "3+",
+  damage: "1",
+  keyChance: "10%",
+  itemType: "WEAPON",
+  itemName: "Frost Fang",
+  itemEffect: "⚔️ +1 Attack"
+},
+
+mountainYeti: {
+  region: "❄️ FROSTPEAK MOUNTAINS",
+  name: "MOUNTAIN YETI",
+  rarity: "● UNCOMMON",
+  image: "images/frostpeak-mountains/mountain-yeti.png",
+  roll: "4+",
+  damage: "3",
+  keyChance: "20%",
+  itemType: "ARMOUR",
+  itemName: "Yeti Fur",
+  itemEffect: "❤️ +2 Max HP"
+},
+
+frostbittenPolarBear: {
+  region: "❄️ FROSTPEAK MOUNTAINS",
+  name: "FROSTBITTEN POLAR BEAR",
+  rarity: "● UNCOMMON",
+  image: "images/frostpeak-mountains/frostbitten-polar-bear.png",
+  roll: "4+",
+  damage: "3",
+  keyChance: "20%",
+  itemType: "WEAPON",
+  itemName: "Polar Claw",
+  itemEffect: "⚔️ +2 Attack"
+},
+
+frostbornWarrior: {
+  region: "❄️ FROSTPEAK MOUNTAINS",
+  name: "FROSTBORN WARRIOR",
+  rarity: "● UNCOMMON",
+  image: "images/frostpeak-mountains/frostborn-warrior.png",
+  roll: "4+",
+  damage: "3",
+  keyChance: "20%",
+  itemType: "ACCESSORY",
+  itemName: "Warrior's Ice Sigil",
+  itemEffect: "Once per region, add +1 to a failed monster battle roll"
+},
+
+iceElemental: {
+  region: "❄️ FROSTPEAK MOUNTAINS",
+  name: "ICE ELEMENTAL",
+  rarity: "● RARE",
+  image: "images/frostpeak-mountains/ice-elemental.png",
+  roll: "5+",
+  damage: "4",
+  keyChance: "30%",
+  itemType: "ACCESSORY",
+  itemName: "Elemental Core",
+  itemEffect: "Once per region, ignore all damage from one Trap event"
+},
+
+crystalGolem: {
+  region: "❄️ FROSTPEAK MOUNTAINS",
+  name: "CRYSTAL GOLEM",
+  rarity: "● RARE",
+  image: "images/frostpeak-mountains/crystal-golem.png",
+  roll: "5+",
+  damage: "4",
+  keyChance: "30%",
+  itemType: "ARMOUR",
+  itemName: "Crystal Plate",
+  itemEffect: "❤️ +3 Max HP"
+},
+
+frostWyvern: {
+  region: "❄️ FROSTPEAK MOUNTAINS",
+  name: "FROST WYVERN",
+  rarity: "● RARE",
+  image: "images/frostpeak-mountains/frost-wyvern.png",
+  roll: "5+",
+  damage: "4",
+  keyChance: "30%",
+  itemType: "WEAPON",
+  itemName: "Wyvern Talon",
+  itemEffect: "⚔️ +3 Attack"
+},
+
+ancientIceGiant: {
+  region: "❄️ FROSTPEAK MOUNTAINS",
+  name: "ANCIENT ICE GIANT",
+  rarity: "● LEGENDARY",
+  image: "images/frostpeak-mountains/ancient-ice-giant.png",
+  roll: "6+",
+  damage: "6",
+  keyChance: "50%",
+  itemType: "ACCESSORY",
+  itemName: "Heart of Winter",
+  itemEffect: "Once per region, prevent all damage from one failed boss battle"
+},
+
+ashImp: {
+  region: "🌋 LAVA LAKES",
+  name: "ASH IMP",
+  rarity: "● COMMON",
+  image: "images/lava-lakes/ash-imp.png",
+  roll: "3+",
+  damage: "2",
+  keyChance: "10%",
+  itemType: "WEAPON",
+  itemName: "Ember Knife",
+  itemEffect: "⚔️ +1 Attack"
+},
+
+tormentedDemon: {
+  region: "🌋 LAVA LAKES",
+  name: "TORMENTED DEMON",
+  rarity: "● COMMON",
+  image: "images/lava-lakes/tormented-demon.png",
+  roll: "3+",
+  damage: "2",
+  keyChance: "10%",
+  itemType: "ARMOUR",
+  itemName: "Charred Hide",
+  itemEffect: "❤️ +1 Max HP"
+},
+
+lavaBeetle: {
+  region: "🌋 LAVA LAKES",
+  name: "LAVA BEETLE",
+  rarity: "● COMMON",
+  image: "images/lava-lakes/lava-beetle.png",
+  roll: "3+",
+  damage: "1",
+  keyChance: "10%",
+  itemType: "ACCESSORY",
+  itemName: "Molten Shell Charm",
+  itemEffect: "Once per region, reduce Trap damage by 2"
+},
+
+lavaVeinedCerberus: {
+  region: "🌋 LAVA LAKES",
+  name: "LAVA VEINED CERBERUS",
+  rarity: "● UNCOMMON",
+  image: "images/lava-lakes/lava-veined-cerberus.png",
+  roll: "4+",
+  damage: "3",
+  keyChance: "20%",
+  itemType: "WEAPON",
+  itemName: "Cerberus Fang",
+  itemEffect: "⚔️ +2 Attack"
+},
+
+soulTorcherer: {
+  region: "🌋 LAVA LAKES",
+  name: "SOUL TORCHERER",
+  rarity: "● UNCOMMON",
+  image: "images/lava-lakes/soul-torcherer.png",
+  roll: "4+",
+  damage: "3",
+  keyChance: "20%",
+  itemType: "ACCESSORY",
+  itemName: "Burning Soul",
+  itemEffect: "Once per region, add +1 to a failed monster battle roll"
+},
+
+fireElemental: {
+  region: "🌋 LAVA LAKES",
+  name: "FIRE ELEMENTAL",
+  rarity: "● UNCOMMON",
+  image: "images/lava-lakes/fire-elemental.png",
+  roll: "4+",
+  damage: "3",
+  keyChance: "20%",
+  itemType: "ARMOUR",
+  itemName: "Flamebound Mantle",
+  itemEffect: "❤️ +2 Max HP"
+},
+
+obsidianGolem: {
+  region: "🌋 LAVA LAKES",
+  name: "OBSIDIAN GOLEM",
+  rarity: "● RARE",
+  image: "images/lava-lakes/obsidian-golem.png",
+  roll: "5+",
+  damage: "4",
+  keyChance: "30%",
+  itemType: "ARMOUR",
+  itemName: "Obsidian Plate",
+  itemEffect: "❤️ +3 Max HP"
+},
+
+devilsCommander: {
+  region: "🌋 LAVA LAKES",
+  name: "DEVIL'S COMMANDER",
+  rarity: "● RARE",
+  image: "images/lava-lakes/devils-commander.png",
+  roll: "5+",
+  damage: "4",
+  keyChance: "30%",
+  itemType: "WEAPON",
+  itemName: "Infernal Greatblade",
+  itemEffect: "⚔️ +3 Attack"
+},
+
+magmaDrake: {
+  region: "🌋 LAVA LAKES",
+  name: "MAGMA DRAKE",
+  rarity: "● RARE",
+  image: "images/lava-lakes/magma-drake.png",
+  roll: "5+",
+  damage: "4",
+  keyChance: "30%",
+  itemType: "ACCESSORY",
+  itemName: "Drake Ember",
+  itemEffect: "Once per region, prevent 3 damage from a failed monster battle"
+},
+
+infernalBehemoth: {
+  region: "🌋 LAVA LAKES",
+  name: "INFERNAL BEHEMOTH",
+  rarity: "● LEGENDARY",
+  image: "images/lava-lakes/infernal-behemoth.png",
+  roll: "6+",
+  damage: "6",
+  keyChance: "50%",
+  itemType: "ACCESSORY",
+  itemName: "Infernal Core",
+  itemEffect: "Once per region, turn one failed monster battle into a success"
+},
+
+swampWitch: {
+  region: "🐸 STINKY SWAMP",
+  name: "SWAMP WITCH",
+  rarity: "● COMMON",
+  image: "images/stinky-swamp/swamp-witch.png",
+  roll: "3+",
+  damage: "2",
+  keyChance: "10%",
+  itemType: "ACCESSORY",
+  itemName: "Witch's Brew",
+  itemEffect: "Once per region, heal 2 HP after a failed monster battle"
+},
+
+giantLeech: {
+  region: "🐸 STINKY SWAMP",
+  name: "GIANT LEECH",
+  rarity: "● COMMON",
+  image: "images/stinky-swamp/giant-leech.png",
+  roll: "3+",
+  damage: "2",
+  keyChance: "10%",
+  itemType: "WEAPON",
+  itemName: "Leech Fang",
+  itemEffect: "⚔️ +1 Attack"
+},
+
+mireToad: {
+  region: "🐸 STINKY SWAMP",
+  name: "MIRE TOAD",
+  rarity: "● COMMON",
+  image: "images/stinky-swamp/mire-toad.png",
+  roll: "3+",
+  damage: "1",
+  keyChance: "10%",
+  itemType: "ARMOUR",
+  itemName: "Mirehide Vest",
+  itemEffect: "❤️ +1 Max HP"
+},
+
+fungalOgre: {
+  region: "🐸 STINKY SWAMP",
+  name: "FUNGAL OGRE",
+  rarity: "● UNCOMMON",
+  image: "images/stinky-swamp/fungal-ogre.png",
+  roll: "4+",
+  damage: "3",
+  keyChance: "20%",
+  itemType: "ARMOUR",
+  itemName: "Ogrehide Armour",
+  itemEffect: "❤️ +2 Max HP"
+},
+
+bogSerpent: {
+  region: "🐸 STINKY SWAMP",
+  name: "BOG SERPENT",
+  rarity: "● UNCOMMON",
+  image: "images/stinky-swamp/bog-serpent.png",
+  roll: "4+",
+  damage: "3",
+  keyChance: "20%",
+  itemType: "WEAPON",
+  itemName: "Serpent Fang",
+  itemEffect: "⚔️ +2 Attack"
+},
+
+sporeParasite: {
+  region: "🐸 STINKY SWAMP",
+  name: "SPORE PARASITE",
+  rarity: "● UNCOMMON",
+  image: "images/stinky-swamp/spore-parasite.png",
+  roll: "4+",
+  damage: "3",
+  keyChance: "20%",
+  itemType: "ACCESSORY",
+  itemName: "Parasitic Spore",
+  itemEffect: "Heal 1 HP after defeating a monster"
+},
+
+marshProtector: {
+  region: "🐸 STINKY SWAMP",
+  name: "MARSH PROTECTOR",
+  rarity: "● RARE",
+  image: "images/stinky-swamp/marsh-protector.png",
+  roll: "5+",
+  damage: "4",
+  keyChance: "30%",
+  itemType: "ARMOUR",
+  itemName: "Marshguard Plate",
+  itemEffect: "❤️ +3 Max HP"
+},
+
+plagueTroll: {
+  region: "🐸 STINKY SWAMP",
+  name: "PLAGUE TROLL",
+  rarity: "● RARE",
+  image: "images/stinky-swamp/plague-troll.png",
+  roll: "5+",
+  damage: "4",
+  keyChance: "30%",
+  itemType: "WEAPON",
+  itemName: "Plague Cleaver",
+  itemEffect: "⚔️ +3 Attack"
+},
+
+hydraSpawn: {
+  region: "🐸 STINKY SWAMP",
+  name: "HYDRA SPAWN",
+  rarity: "● RARE",
+  image: "images/stinky-swamp/hydra-spawn.png",
+  roll: "5+",
+  damage: "4",
+  keyChance: "30%",
+  itemType: "ACCESSORY",
+  itemName: "Hydra Scale",
+  itemEffect: "Once per region, reroll a failed monster battle"
+},
+
+ancientBogHorror: {
+  region: "🐸 STINKY SWAMP",
+  name: "ANCIENT BOG HORROR",
+  rarity: "● LEGENDARY",
+  image: "images/stinky-swamp/ancient-bog-horror.png",
+  roll: "6+",
+  damage: "6",
+  keyChance: "50%",
+  itemType: "ACCESSORY",
+  itemName: "Bog Heart",
+  itemEffect: "Once per region, revive at 3 HP after taking lethal monster damage"
+},
+
+cursedPeasant: {
+  region: "🏰 THE FALLEN KINGDOM",
+  name: "CURSED PEASANT",
+  rarity: "● COMMON",
+  image: "images/the-fallen-kingdom/cursed-peasant.png",
+  roll: "3+",
+  damage: "2",
+  keyChance: "10%",
+  itemType: "WEAPON",
+  itemName: "Rusty Sickle",
+  itemEffect: "⚔️ +1 Attack"
+},
+
+skeletalGuard: {
+  region: "🏰 THE FALLEN KINGDOM",
+  name: "SKELETAL GUARD",
+  rarity: "● COMMON",
+  image: "images/the-fallen-kingdom/skeletal-guard.png",
+  roll: "3+",
+  damage: "2",
+  keyChance: "10%",
+  itemType: "ARMOUR",
+  itemName: "Guard's Chainmail",
+  itemEffect: "❤️ +1 Max HP"
+},
+
+graveyardRabbit: {
+  region: "🏰 THE FALLEN KINGDOM",
+  name: "GRAVEYARD RABBIT",
+  rarity: "● COMMON",
+  image: "images/the-fallen-kingdom/graveyard-rabbit.png",
+  roll: "3+",
+  damage: "1",
+  keyChance: "10%",
+  itemType: "ACCESSORY",
+  itemName: "Lucky Rabbit Bone",
+  itemEffect: "Once per region, reroll a movement roll"
+},
+
+undeadArcher: {
+  region: "🏰 THE FALLEN KINGDOM",
+  name: "UNDEAD ARCHER",
+  rarity: "● UNCOMMON",
+  image: "images/the-fallen-kingdom/undead-archer.png",
+  roll: "4+",
+  damage: "3",
+  keyChance: "20%",
+  itemType: "WEAPON",
+  itemName: "Gravebow",
+  itemEffect: "⚔️ +2 Attack"
+},
+
+fallenSquire: {
+  region: "🏰 THE FALLEN KINGDOM",
+  name: "FALLEN SQUIRE",
+  rarity: "● UNCOMMON",
+  image: "images/the-fallen-kingdom/fallen-squire.png",
+  roll: "4+",
+  damage: "3",
+  keyChance: "20%",
+  itemType: "ARMOUR",
+  itemName: "Squire's Plate",
+  itemEffect: "❤️ +2 Max HP"
+},
+
+hauntedArmour: {
+  region: "🏰 THE FALLEN KINGDOM",
+  name: "HAUNTED ARMOUR",
+  rarity: "● UNCOMMON",
+  image: "images/the-fallen-kingdom/haunted-armour.png",
+  roll: "4+",
+  damage: "3",
+  keyChance: "20%",
+  itemType: "ACCESSORY",
+  itemName: "Haunted Crest",
+  itemEffect: "Once per region, reduce damage from a failed monster battle by 2"
+},
+
+headlessKnight: {
+  region: "🏰 THE FALLEN KINGDOM",
+  name: "HEADLESS KNIGHT",
+  rarity: "● RARE",
+  image: "images/the-fallen-kingdom/headless-knight.png",
+  roll: "5+",
+  damage: "4",
+  keyChance: "30%",
+  itemType: "ARMOUR",
+  itemName: "Headless Knight's Plate",
+  itemEffect: "❤️ +3 Max HP"
+},
+
+royalExecutioner: {
+  region: "🏰 THE FALLEN KINGDOM",
+  name: "ROYAL EXECUTIONER",
+  rarity: "● RARE",
+  image: "images/the-fallen-kingdom/royal-executioner.png",
+  roll: "5+",
+  damage: "4",
+  keyChance: "30%",
+  itemType: "WEAPON",
+  itemName: "Executioner's Axe",
+  itemEffect: "⚔️ +3 Attack"
+},
+
+courtNecromancer: {
+  region: "🏰 THE FALLEN KINGDOM",
+  name: "COURT NECROMANCER",
+  rarity: "● RARE",
+  image: "images/the-fallen-kingdom/court-necromancer.png",
+  roll: "5+",
+  damage: "4",
+  keyChance: "30%",
+  itemType: "ACCESSORY",
+  itemName: "Necromancer's Grimoire",
+  itemEffect: "Once per region, add +2 to a failed monster battle roll"
+},
+
+theSkeletonKing: {
+  region: "🏰 THE FALLEN KINGDOM",
+  name: "THE SKELETON KING",
+  rarity: "● LEGENDARY",
+  image: "images/the-fallen-kingdom/the-skeleton-king.png",
+  roll: "6+",
+  damage: "6",
+  keyChance: "50%",
+  itemType: "ACCESSORY",
+  itemName: "Crown of the Fallen",
+  itemEffect: "Once per region, turn one failed monster battle into a success"
+},
+
+reefCrab: {
+  region: "🌊 THE DROWNED COAST",
+  name: "REEF CRAB",
+  rarity: "● COMMON",
+  image: "images/the-drowned-coast/reef-crab.png",
+  roll: "3+",
+  damage: "1",
+  keyChance: "10%",
+  itemType: "ARMOUR",
+  itemName: "Reef Shell",
+  itemEffect: "❤️ +1 Max HP"
+},
+
+drownedSailor: {
+  region: "🌊 THE DROWNED COAST",
+  name: "DROWNED SAILOR",
+  rarity: "● COMMON",
+  image: "images/the-drowned-coast/drowned-sailor.png",
+  roll: "3+",
+  damage: "2",
+  keyChance: "10%",
+  itemType: "WEAPON",
+  itemName: "Rusty Cutlass",
+  itemEffect: "⚔️ +1 Attack"
+},
+
+saltwaterSlime: {
+  region: "🌊 THE DROWNED COAST",
+  name: "SALTWATER SLIME",
+  rarity: "● COMMON",
+  image: "images/the-drowned-coast/saltwater-slime.png",
+  roll: "3+",
+  damage: "2",
+  keyChance: "10%",
+  itemType: "ACCESSORY",
+  itemName: "Slime Pearl",
+  itemEffect: "Heal 1 HP after defeating a monster"
+},
+
+pirateMarauder: {
+  region: "🌊 THE DROWNED COAST",
+  name: "PIRATE MARAUDER",
+  rarity: "● UNCOMMON",
+  image: "images/the-drowned-coast/pirate-marauder.png",
+  roll: "4+",
+  damage: "3",
+  keyChance: "20%",
+  itemType: "WEAPON",
+  itemName: "Marauder's Cutlass",
+  itemEffect: "⚔️ +2 Attack"
+},
+
+reefSerpent: {
+  region: "🌊 THE DROWNED COAST",
+  name: "REEF SERPENT",
+  rarity: "● UNCOMMON",
+  image: "images/the-drowned-coast/reef-serpent.png",
+  roll: "4+",
+  damage: "3",
+  keyChance: "20%",
+  itemType: "ARMOUR",
+  itemName: "Serpent Scale Vest",
+  itemEffect: "❤️ +2 Max HP"
+},
+
+drownedMusketeer: {
+  region: "🌊 THE DROWNED COAST",
+  name: "DROWNED MUSKETEER",
+  rarity: "● UNCOMMON",
+  image: "images/the-drowned-coast/drowned-musketeer.png",
+  roll: "4+",
+  damage: "3",
+  keyChance: "20%",
+  itemType: "ACCESSORY",
+  itemName: "Waterlogged Compass",
+  itemEffect: "Once per region, reroll a movement roll"
+},
+
+siren: {
+  region: "🌊 THE DROWNED COAST",
+  name: "SIREN",
+  rarity: "● RARE",
+  image: "images/the-drowned-coast/siren.png",
+  roll: "5+",
+  damage: "4",
+  keyChance: "30%",
+  itemType: "ACCESSORY",
+  itemName: "Siren's Pendant",
+  itemEffect: "Once per region, reroll a failed monster battle"
+},
+
+deepwaterSquid: {
+  region: "🌊 THE DROWNED COAST",
+  name: "DEEPWATER SQUID",
+  rarity: "● RARE",
+  image: "images/the-drowned-coast/deepwater-squid.png",
+  roll: "5+",
+  damage: "4",
+  keyChance: "30%",
+  itemType: "ARMOUR",
+  itemName: "Deepwater Mantle",
+  itemEffect: "❤️ +3 Max HP"
+},
+
+shipwreckWraith: {
+  region: "🌊 THE DROWNED COAST",
+  name: "SHIPWRECK WRAITH",
+  rarity: "● RARE",
+  image: "images/the-drowned-coast/shipwreck-wraith.png",
+  roll: "5+",
+  damage: "4",
+  keyChance: "30%",
+  itemType: "WEAPON",
+  itemName: "Wraith Harpoon",
+  itemEffect: "⚔️ +3 Attack"
+},
+
+krakenSpawn: {
+  region: "🌊 THE DROWNED COAST",
+  name: "KRAKEN SPAWN",
+  rarity: "● LEGENDARY",
+  image: "images/the-drowned-coast/kraken-spawn.png",
+  roll: "6+",
+  damage: "6",
+  keyChance: "50%",
+  itemType: "ACCESSORY",
+  itemName: "Kraken Eye",
+  itemEffect: "Once per region, turn one failed monster battle into a success"
+},
+
+restlessSkeleton: {
+  region: "💀 THE DEADLANDS",
+  name: "RESTLESS SKELETON",
+  rarity: "● COMMON",
+  image: "images/the-deadlands/restless-skeleton.png",
+  roll: "3+",
+  damage: "2",
+  keyChance: "10%",
+  itemType: "WEAPON",
+  itemName: "Bone Blade",
+  itemEffect: "⚔️ +1 Attack"
+},
+
+cryptKeeper: {
+  region: "💀 THE DEADLANDS",
+  name: "CRYPT KEEPER",
+  rarity: "● COMMON",
+  image: "images/the-deadlands/crypt-keeper.png",
+  roll: "3+",
+  damage: "2",
+  keyChance: "10%",
+  itemType: "ARMOUR",
+  itemName: "Cryptkeeper's Cloak",
+  itemEffect: "❤️ +1 Max HP"
+},
+
+wanderingCorpse: {
+  region: "💀 THE DEADLANDS",
+  name: "WANDERING CORPSE",
+  rarity: "● COMMON",
+  image: "images/the-deadlands/wandering-corpse.png",
+  roll: "3+",
+  damage: "1",
+  keyChance: "10%",
+  itemType: "ACCESSORY",
+  itemName: "Grave Charm",
+  itemEffect: "Once per region, reduce damage from a failed monster battle by 1"
+},
+
+ghoul: {
+  region: "💀 THE DEADLANDS",
+  name: "GHOUL",
+  rarity: "● UNCOMMON",
+  image: "images/the-deadlands/ghoul.png",
+  roll: "4+",
+  damage: "3",
+  keyChance: "20%",
+  itemType: "WEAPON",
+  itemName: "Ghoul Claw",
+  itemEffect: "⚔️ +2 Attack"
+},
+
+boneWarrior: {
+  region: "💀 THE DEADLANDS",
+  name: "BONE WARRIOR",
+  rarity: "● UNCOMMON",
+  image: "images/the-deadlands/bone-warrior.png",
+  roll: "4+",
+  damage: "3",
+  keyChance: "20%",
+  itemType: "ARMOUR",
+  itemName: "Boneplate Armour",
+  itemEffect: "❤️ +2 Max HP"
+},
+
+lostSpirit: {
+  region: "💀 THE DEADLANDS",
+  name: "LOST SPIRIT",
+  rarity: "● UNCOMMON",
+  image: "images/the-deadlands/lost-spirit.png",
+  roll: "4+",
+  damage: "3",
+  keyChance: "20%",
+  itemType: "ACCESSORY",
+  itemName: "Spirit Lantern",
+  itemEffect: "Once per region, ignore one Trap event"
+},
+
+wraith: {
+  region: "💀 THE DEADLANDS",
+  name: "WRAITH",
+  rarity: "● RARE",
+  image: "images/the-deadlands/wraith.png",
+  roll: "5+",
+  damage: "4",
+  keyChance: "30%",
+  itemType: "ACCESSORY",
+  itemName: "Wraith Essence",
+  itemEffect: "Once per region, reroll a failed monster battle"
+},
+
+boneGolem: {
+  region: "💀 THE DEADLANDS",
+  name: "BONE GOLEM",
+  rarity: "● RARE",
+  image: "images/the-deadlands/bone-golem.png",
+  roll: "5+",
+  damage: "4",
+  keyChance: "30%",
+  itemType: "ARMOUR",
+  itemName: "Golem Boneplate",
+  itemEffect: "❤️ +3 Max HP"
+},
+
+deathKnight: {
+  region: "💀 THE DEADLANDS",
+  name: "DEATH KNIGHT",
+  rarity: "● RARE",
+  image: "images/the-deadlands/death-knight.png",
+  roll: "5+",
+  damage: "4",
+  keyChance: "30%",
+  itemType: "WEAPON",
+  itemName: "Deathblade",
+  itemEffect: "⚔️ +3 Attack"
+},
+
+lichLord: {
+  region: "💀 THE DEADLANDS",
+  name: "LICH LORD",
+  rarity: "● LEGENDARY",
+  image: "images/the-deadlands/lich-lord.png",
+  roll: "6+",
+  damage: "6",
+  keyChance: "50%",
+  itemType: "ACCESSORY",
+  itemName: "Lich's Phylactery",
+  itemEffect: "Once per region, survive lethal monster damage at 1 HP"
+},
+
+arcaneWisp: {
+  region: "✨ THE SHATTERED REALM",
+  name: "ARCANE WISP",
+  rarity: "● COMMON",
+  image: "images/the-shattered-realm/arcane-wisp.png",
+  roll: "3+",
+  damage: "2",
+  keyChance: "10%",
+  itemType: "ACCESSORY",
+  itemName: "Wisp Essence",
+  itemEffect: "Once per region, add +1 to a failed monster battle roll"
+},
+
+shardling: {
+  region: "✨ THE SHATTERED REALM",
+  name: "SHARDLING",
+  rarity: "● COMMON",
+  image: "images/the-shattered-realm/shardling.png",
+  roll: "3+",
+  damage: "1",
+  keyChance: "10%",
+  itemType: "ARMOUR",
+  itemName: "Shardmail",
+  itemEffect: "❤️ +1 Max HP"
+},
+
+manaGenie: {
+  region: "✨ THE SHATTERED REALM",
+  name: "MANA GENIE",
+  rarity: "● COMMON",
+  image: "images/the-shattered-realm/mana-genie.png",
+  roll: "3+",
+  damage: "2",
+  keyChance: "10%",
+  itemType: "WEAPON",
+  itemName: "Mana Blade",
+  itemEffect: "⚔️ +1 Attack"
+},
+
+wizardApprentice: {
+  region: "✨ THE SHATTERED REALM",
+  name: "WIZARD APPRENTICE",
+  rarity: "● UNCOMMON",
+  image: "images/the-shattered-realm/wizard-apprentice.png",
+  roll: "4+",
+  damage: "3",
+  keyChance: "20%",
+  itemType: "WEAPON",
+  itemName: "Apprentice's Wand",
+  itemEffect: "⚔️ +2 Attack"
+},
+
+arcaneConstruct: {
+  region: "✨ THE SHATTERED REALM",
+  name: "ARCANE CONSTRUCT",
+  rarity: "● UNCOMMON",
+  image: "images/the-shattered-realm/arcane-construct.png",
+  roll: "4+",
+  damage: "3",
+  keyChance: "20%",
+  itemType: "ARMOUR",
+  itemName: "Arcane Plating",
+  itemEffect: "❤️ +2 Max HP"
+},
+
+voidWanderer: {
+  region: "✨ THE SHATTERED REALM",
+  name: "VOID WANDERER",
+  rarity: "● UNCOMMON",
+  image: "images/the-shattered-realm/void-wanderer.png",
+  roll: "4+",
+  damage: "3",
+  keyChance: "20%",
+  itemType: "ACCESSORY",
+  itemName: "Void Compass",
+  itemEffect: "Once per region, reroll a movement roll"
+},
+
+chaosElemental: {
+  region: "✨ THE SHATTERED REALM",
+  name: "CHAOS ELEMENTAL",
+  rarity: "● RARE",
+  image: "images/the-shattered-realm/chaos-elemental.png",
+  roll: "5+",
+  damage: "4",
+  keyChance: "30%",
+  itemType: "ACCESSORY",
+  itemName: "Chaos Orb",
+  itemEffect: "Once per region, reroll a failed monster battle"
+},
+
+riftSorcerer: {
+  region: "✨ THE SHATTERED REALM",
+  name: "RIFT SORCERER",
+  rarity: "● RARE",
+  image: "images/the-shattered-realm/rift-sorcerer.png",
+  roll: "5+",
+  damage: "4",
+  keyChance: "30%",
+  itemType: "WEAPON",
+  itemName: "Rift Staff",
+  itemEffect: "⚔️ +3 Attack"
+},
+
+shardGolem: {
+  region: "✨ THE SHATTERED REALM",
+  name: "SHARD GOLEM",
+  rarity: "● RARE",
+  image: "images/the-shattered-realm/shard-golem.png",
+  roll: "5+",
+  damage: "4",
+  keyChance: "30%",
+  itemType: "ARMOUR",
+  itemName: "Shatterplate",
+  itemEffect: "❤️ +3 Max HP"
+},
+
+theAncientBeing: {
+  region: "✨ THE SHATTERED REALM",
+  name: "THE ANCIENT BEING",
+  rarity: "● LEGENDARY",
+  image: "images/the-shattered-realm/the-ancient-being.png",
+  roll: "6+",
+  damage: "6",
+  keyChance: "50%",
+  itemType: "ACCESSORY",
+  itemName: "Ancient Relic",
+  itemEffect: "Once per region, turn one failed monster battle into a success"
+},
+
+gearling: {
+  region: "⚙️ THE IRON WASTES",
+  name: "GEARLING",
+  rarity: "● COMMON",
+  image: "images/the-iron-wastes/gearling.png",
+  roll: "3+",
+  damage: "2",
+  keyChance: "10%",
+  itemType: "WEAPON",
+  itemName: "Gearblade",
+  itemEffect: "⚔️ +1 Attack"
+},
+
+scrapGobbler: {
+  region: "⚙️ THE IRON WASTES",
+  name: "SCRAP GOBBLER",
+  rarity: "● COMMON",
+  image: "images/the-iron-wastes/scrap-gobbler.png",
+  roll: "3+",
+  damage: "2",
+  keyChance: "10%",
+  itemType: "ARMOUR",
+  itemName: "Scrapplate",
+  itemEffect: "❤️ +1 Max HP"
+},
+
+rustyWalker: {
+  region: "⚙️ THE IRON WASTES",
+  name: "RUSTY WALKER",
+  rarity: "● COMMON",
+  image: "images/the-iron-wastes/rusty-walker.png",
+  roll: "3+",
+  damage: "1",
+  keyChance: "10%",
+  itemType: "ACCESSORY",
+  itemName: "Rusty Cog",
+  itemEffect: "Once per region, reduce damage from a failed monster battle by 1"
+},
+
+chaincrawler: {
+  region: "⚙️ THE IRON WASTES",
+  name: "CHAINCRAWLER",
+  rarity: "● UNCOMMON",
+  image: "images/the-iron-wastes/chaincrawler.png",
+  roll: "4+",
+  damage: "3",
+  keyChance: "20%",
+  itemType: "ACCESSORY",
+  itemName: "Chainlink Charm",
+  itemEffect: "Once per region, reroll a movement roll"
+},
+
+sawbladeStalker: {
+  region: "⚙️ THE IRON WASTES",
+  name: "SAWBLADE STALKER",
+  rarity: "● UNCOMMON",
+  image: "images/the-iron-wastes/sawblade-stalker.png",
+  roll: "4+",
+  damage: "3",
+  keyChance: "20%",
+  itemType: "WEAPON",
+  itemName: "Sawblade",
+  itemEffect: "⚔️ +2 Attack"
+},
+
+furnaceBrute: {
+  region: "⚙️ THE IRON WASTES",
+  name: "FURNACE BRUTE",
+  rarity: "● UNCOMMON",
+  image: "images/the-iron-wastes/furnace-brute.png",
+  roll: "4+",
+  damage: "3",
+  keyChance: "20%",
+  itemType: "ARMOUR",
+  itemName: "Furnace Plate",
+  itemEffect: "❤️ +2 Max HP"
+},
+
+boilerBeast: {
+  region: "⚙️ THE IRON WASTES",
+  name: "BOILER BEAST",
+  rarity: "● RARE",
+  image: "images/the-iron-wastes/boiler-beast.png",
+  roll: "5+",
+  damage: "4",
+  keyChance: "30%",
+  itemType: "ARMOUR",
+  itemName: "Boiler Armour",
+  itemEffect: "❤️ +3 Max HP"
+},
+
+warEngine: {
+  region: "⚙️ THE IRON WASTES",
+  name: "WAR ENGINE",
+  rarity: "● RARE",
+  image: "images/the-iron-wastes/war-engine.png",
+  roll: "5+",
+  damage: "4",
+  keyChance: "30%",
+  itemType: "WEAPON",
+  itemName: "Engine Cleaver",
+  itemEffect: "⚔️ +3 Attack"
+},
+
+moltenGolem: {
+  region: "⚙️ THE IRON WASTES",
+  name: "MOLTEN GOLEM",
+  rarity: "● RARE",
+  image: "images/the-iron-wastes/molten-golem.png",
+  roll: "5+",
+  damage: "4",
+  keyChance: "30%",
+  itemType: "ACCESSORY",
+  itemName: "Molten Core",
+  itemEffect: "Once per region, prevent 3 damage from a failed monster battle"
+},
+
+theIronTyrant: {
+  region: "⚙️ THE IRON WASTES",
+  name: "THE IRON TYRANT",
+  rarity: "● LEGENDARY",
+  image: "images/the-iron-wastes/the-iron-tyrant.png",
+  roll: "6+",
+  damage: "6",
+  keyChance: "50%",
+  itemType: "ACCESSORY",
+  itemName: "Tyrant Core",
+  itemEffect: "Once per region, turn one failed monster battle into a success"
+}
+};
+
+
+function cardMonsterBookId(card){
+  return card.name.toLowerCase().replace(/[^a-z0-9]+/g,"-");
+}
+
+function allCardMonsters(){
+  return Object.values(CARD_MONSTERS);
+}
+
+function legacyMonsterFromCard(card){
+  let rarity="COMMON";
+  if(card.rarity.includes("UNCOMMON")) rarity="UNCOMMON";
+  else if(card.rarity.includes("RARE")) rarity="RARE";
+  else if(card.rarity.includes("LEGENDARY")) rarity="LEGENDARY";
+
+  let attackBonus=0;
+  let hpBonus=0;
+  const attackMatch=card.itemEffect.match(/\+(\d+)\s*Attack/i);
+  const hpMatch=card.itemEffect.match(/\+(\d+)\s*Max HP/i);
+  if(attackMatch) attackBonus=parseInt(attackMatch[1]);
+  if(hpMatch) hpBonus=parseInt(hpMatch[1]);
+
+  return [
+    card.name,
+    "👾",
+    rarity,
+    parseInt(card.roll),
+    parseInt(card.damage),
+    card.itemName,
+    card.itemEffect,
+    attackBonus,
+    hpBonus,
+    card.itemType
+  ];
+}
+
+const REGION_MONSTERS = {
+
+"Whispering Woods": [
+    CARD_MONSTERS.goblinScout,
+    CARD_MONSTERS.giantBrambleRat,
+    CARD_MONSTERS.webwoodSpider,
+    CARD_MONSTERS.direWolf,
+    CARD_MONSTERS.goblinhuntsman,
+    CARD_MONSTERS.fungalbrute,
+    CARD_MONSTERS.corruptedstag,
+    CARD_MONSTERS.mossbacktroll,
+    CARD_MONSTERS.briarwitch,
+    CARD_MONSTERS.elderwoodguardian
+],
+
+"Sunscorch Sands": [
+  CARD_MONSTERS.duneScarab,
+  CARD_MONSTERS.sandJackal,
+  CARD_MONSTERS.desertBandit,
+  CARD_MONSTERS.giantScorpion,
+  CARD_MONSTERS.sandscaleLizard,
+  CARD_MONSTERS.tombRaider,
+  CARD_MONSTERS.mummifiedGuardian,
+  CARD_MONSTERS.duneStalker,
+  CARD_MONSTERS.sandDjinn,
+  CARD_MONSTERS.colossalSandworm
+],
+
+"Frostpeak Mountains": [
+  CARD_MONSTERS.evilSnowman,
+  CARD_MONSTERS.iceSorcerer,
+  CARD_MONSTERS.frostBat,
+  CARD_MONSTERS.mountainYeti,
+  CARD_MONSTERS.frostbittenPolarBear,
+  CARD_MONSTERS.frostbornWarrior,
+  CARD_MONSTERS.iceElemental,
+  CARD_MONSTERS.crystalGolem,
+  CARD_MONSTERS.frostWyvern,
+  CARD_MONSTERS.ancientIceGiant
+],
+
+"Lava Lakes": [
+  CARD_MONSTERS.ashImp,
+  CARD_MONSTERS.tormentedDemon,
+  CARD_MONSTERS.lavaBeetle,
+  CARD_MONSTERS.lavaVeinedCerberus,
+  CARD_MONSTERS.soulTorcherer,
+  CARD_MONSTERS.fireElemental,
+  CARD_MONSTERS.obsidianGolem,
+  CARD_MONSTERS.devilsCommander,
+  CARD_MONSTERS.magmaDrake,
+  CARD_MONSTERS.infernalBehemoth
+],
+
+
+"Stinky Swamp": [
+  CARD_MONSTERS.swampWitch,
+  CARD_MONSTERS.giantLeech,
+  CARD_MONSTERS.mireToad,
+  CARD_MONSTERS.fungalOgre,
+  CARD_MONSTERS.bogSerpent,
+  CARD_MONSTERS.sporeParasite,
+  CARD_MONSTERS.marshProtector,
+  CARD_MONSTERS.plagueTroll,
+  CARD_MONSTERS.hydraSpawn,
+  CARD_MONSTERS.ancientBogHorror
+],
+
+"The Fallen Kingdom": [
+  CARD_MONSTERS.cursedPeasant,
+  CARD_MONSTERS.skeletalGuard,
+  CARD_MONSTERS.graveyardRabbit,
+  CARD_MONSTERS.undeadArcher,
+  CARD_MONSTERS.fallenSquire,
+  CARD_MONSTERS.hauntedArmour,
+  CARD_MONSTERS.headlessKnight,
+  CARD_MONSTERS.royalExecutioner,
+  CARD_MONSTERS.courtNecromancer,
+  CARD_MONSTERS.theSkeletonKing
+],
+
+"The Drowned Coast": [
+  CARD_MONSTERS.reefCrab,
+  CARD_MONSTERS.drownedSailor,
+  CARD_MONSTERS.saltwaterSlime,
+  CARD_MONSTERS.pirateMarauder,
+  CARD_MONSTERS.reefSerpent,
+  CARD_MONSTERS.drownedMusketeer,
+  CARD_MONSTERS.siren,
+  CARD_MONSTERS.deepwaterSquid,
+  CARD_MONSTERS.shipwreckWraith,
+  CARD_MONSTERS.krakenSpawn
+],
+
+"The Deadlands": [
+  CARD_MONSTERS.restlessSkeleton,
+  CARD_MONSTERS.cryptKeeper,
+  CARD_MONSTERS.wanderingCorpse,
+  CARD_MONSTERS.ghoul,
+  CARD_MONSTERS.boneWarrior,
+  CARD_MONSTERS.lostSpirit,
+  CARD_MONSTERS.wraith,
+  CARD_MONSTERS.boneGolem,
+  CARD_MONSTERS.deathKnight,
+  CARD_MONSTERS.lichLord
+],
+
+"The Shattered Realm": [
+  CARD_MONSTERS.arcaneWisp,
+  CARD_MONSTERS.shardling,
+  CARD_MONSTERS.manaGenie,
+  CARD_MONSTERS.wizardApprentice,
+  CARD_MONSTERS.arcaneConstruct,
+  CARD_MONSTERS.voidWanderer,
+  CARD_MONSTERS.chaosElemental,
+  CARD_MONSTERS.riftSorcerer,
+  CARD_MONSTERS.shardGolem,
+  CARD_MONSTERS.theAncientBeing
+],
+
+"The Iron Wastes": [
+  CARD_MONSTERS.gearling,
+  CARD_MONSTERS.scrapGobbler,
+  CARD_MONSTERS.rustyWalker,
+  CARD_MONSTERS.chaincrawler,
+  CARD_MONSTERS.sawbladeStalker,
+  CARD_MONSTERS.furnaceBrute,
+  CARD_MONSTERS.boilerBeast,
+  CARD_MONSTERS.warEngine,
+  CARD_MONSTERS.moltenGolem,
+  CARD_MONSTERS.theIronTyrant
+]
+};
+
+function drawRegionMonster(regionName) {
+  const rawPool = REGION_MONSTERS[regionName];
+
+  if(!rawPool || rawPool.length === 0){
+    console.error("No monster pool found for region:", regionName);
+    return null;
+  }
+
+  const regionPool = rawPool.filter(Boolean);
+
+  if(regionPool.length === 0){
+    console.error("Monster pool contains no valid cards for region:", regionName);
+    return null;
+  }
+
+  const rarity = chooseRarity();
+
+  const rarityPool = regionPool.filter(monster =>
+    monster && monster.rarity && monster.rarity.includes(rarity)
+  );
+
+  const finalPool = rarityPool.length ? rarityPool : regionPool;
+
+  return finalPool[Math.floor(Math.random() * finalPool.length)];
+}
+
+function showMonsterCard(monster) {
+
+document.getElementById("monsterCardTemplate").style.display = "block"; setEncounterMode(true);
+
+  document.getElementById("cardRegion").textContent =
+    monster.region;
+
+  document.getElementById("cardName").textContent =
+    monster.name;
+
+  document.getElementById("cardRarity").textContent =
+    monster.rarity;
+
+  document.getElementById("cardMonsterImage").src =
+    monster.image;
+
+  document.getElementById("cardMonsterImage").alt =
+    monster.name;
+
+  document.getElementById("cardRoll").textContent =
+    monster.roll;
+
+  document.getElementById("cardDamage").textContent =
+    monster.damage;
+
+  document.getElementById("cardKeyChance").textContent =
+    monster.keyChance;
+
+  const itemIcon = monster.itemType === "WEAPON" ? "🗡️" :
+                   monster.itemType === "ARMOUR" ? "🛡️" : "💍";
+  document.getElementById("cardItemIcon").textContent = itemIcon;
+
+  document.getElementById("cardItemType").textContent =
+    monster.itemType;
+
+  document.getElementById("cardItemName").textContent =
+    monster.itemName;
+
+  document.getElementById("cardItemEffect").textContent =
+    monster.itemEffect;
+}
+
+function hideMonsterCard(){
+  const card = document.getElementById("monsterCardTemplate");
+  if(card) card.style.display = "none"; setEncounterMode(false);
+}
+
+function setEncounterMode(on){
+  const panel = document.querySelector("aside.panel");
+  if(!panel) return;
+  panel.classList.toggle("encounterMode", !!on);
+}
+
+// Start the menu only after all regional card data has been initialized.
+showStartScreen();
+
+</script>
+</body>
+</html>
