@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Monster Quest v3.8.0</title>
+<title>Monster Quest v3.6.0</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#f8fafc;font-family:system-ui,sans-serif}.wrap{max-width:1400px;margin:auto;padding:20px}
 .grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px}.panel{background:#162033;border:1px solid #334155;border-radius:16px;padding:16px}
@@ -117,41 +117,6 @@ aside.panel{padding:8px;display:flex;flex-direction:column;gap:4px}
  .encounterMode .buttons button{display:inline-block !important}
 }
 
-
-.multiplayerBox{margin:14px auto 0;max-width:520px;padding:12px;background:#0c1525;border:1px solid #334155;border-radius:12px}
-.multiplayerRow{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:8px}
-#roomCodeInput{width:150px;border:1px solid #475569;background:#111827;color:#fff;border-radius:9px;padding:10px;text-transform:uppercase;text-align:center;font-weight:900;letter-spacing:2px}
-#multiplayerStatus{margin-top:8px;min-height:18px;font-size:11px;color:#cbd5e1}
-#roomBadge{display:none;margin:4px 0;padding:5px 8px;background:#172554;border:1px solid #3b82f6;border-radius:8px;font-size:10px;text-align:center}
-
-.playerToken{
-  position:absolute;
-  width:22px;
-  height:22px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:11px;
-  font-weight:900;
-  border:2px solid #fff;
-  box-shadow:0 2px 8px #0009;
-  z-index:5;
-}
-.playerToken.p1{background:#2563eb;left:32%;top:50%;transform:translate(-50%,-50%)}
-.playerToken.p2{background:#dc2626;left:68%;top:50%;transform:translate(-50%,-50%)}
-.turnBanner{
-  text-align:center;
-  font-size:11px;
-  font-weight:900;
-  padding:6px 8px;
-  border-radius:8px;
-  background:#0c1525;
-  border:1px solid #334155;
-}
-.turnBanner.mine{border-color:#22c55e;color:#86efac}
-.turnBanner.wait{border-color:#f59e0b;color:#fde68a}
-
 </style>
 </head>
 <body>
@@ -162,20 +127,10 @@ aside.panel{padding:8px;display:flex;flex-direction:column;gap:4px}
     <div class="gameTitle">Monster Quest<span>BOARD ADVENTURE</span></div>
     <div class="tagline">Travel through dangerous regions, collect monster cards, equip powerful loot, survive the Road of Defeat, and conquer the Ancient Dragon.</div>
     <div class="menuButtons">
-      <button id="startGameBtn">🎲 Single Player</button>
+      <button id="startGameBtn">🎲 New Game</button>
       <button id="openBookBtn" class="secondary">📖 Collection Book</button>
     </div>
-    <div class="multiplayerBox">
-      <b>🌐 Multiplayer Test</b>
-      <div class="small">Create a shared world or join your mate using a room code.</div>
-      <div class="multiplayerRow"><button id="createRoomBtn">➕ Create Multiplayer Game</button></div>
-      <div class="multiplayerRow">
-        <input id="roomCodeInput" maxlength="6" placeholder="ROOM CODE">
-        <button id="joinRoomBtn" class="secondary">🔗 Join Game</button>
-      </div>
-      <div id="multiplayerStatus">Connecting to Firebase...</div>
-    </div>
-    <div class="small" style="margin-top:18px">Multiplayer Stage 2A v3.8.0 · Collection progress saves in this browser</div>
+    <div class="small" style="margin-top:18px">Single-player prototype v3.6.0 · Collection progress saves in this browser</div>
   </div>
 </div>
 
@@ -191,13 +146,11 @@ aside.panel{padding:8px;display:flex;flex-direction:column;gap:4px}
 </div>
 
 <div id="gameShell" class="wrap gameShell hiddenGame">
-<h1>🎲 Monster Quest v3.8.0</h1>
+<h1>🎲 Monster Quest v3.6.0</h1>
 <div class="sub">Accessory effects active — Silkweave, Spore, Briar and Heartwood now work; Road penalties clear at Town.</div>
 <div class="grid">
 <main class="panel"><h2>🗺️ Shared World</h2><div id="world"></div></main>
 <aside class="panel">
-<div id="roomBadge"></div>
-<div id="turnBanner" class="turnBanner" style="display:none"></div>
 <div id="players" class="players"></div>
 <div class="stats">
 <div class="stat">❤️ HP<b id="hp"></b></div><div class="stat">⚔️ Attack<b id="atk"></b></div><div class="stat">🃏 Cards<b id="cards"></b></div>
@@ -643,7 +596,6 @@ function newGame(){ setEncounterMode(false);
     .sort(()=>Math.random()-0.5)
     .slice(0,4),
    active:0,
-   multiplayer:null,
    phase:"move",
    encounter:null,
    pendingMovementRoll:null,
@@ -726,7 +678,7 @@ function render(){
      <div class="townTile ${isCurrent&&localSpace(p)===0?"me":""}">
        <b>🏘️ TOWN</b>
        <span class="small">Region starting area</span>
-       ${G.players.map((pl,i)=>playerIsAtTown(pl,ri)?playerTokenHtml(i):"").join("")}
+       ${isCurrent&&p.locationMode==="town"?'<span class="token">🧙</span>':""}
      </div>
      <div class="spaces">`;
 
@@ -741,13 +693,13 @@ function render(){
      if(event)cls+=" event";
      if(isCurrent&&localSpace(p)===s)cls+=" me";
      let icon=s===20?"🔒":isMonsterTile?"👾":event?event.icon:"";
-     let token=G.players.map((pl,i)=>playerIsAtBoardSpace(pl,ri,s)?playerTokenHtml(i):"").join("");
+     let token=isCurrent&&((p.locationMode==="board"&&localSpace(p)===s)||(p.locationMode==="gate"&&s===20))?'<span class="token">🧙</span>':"";
      html+=`<div class="${cls}"><b>${s}</b><span class="icon">${icon}</span>${token}</div>`;
    }
    html+=`</div>
    <div class="townTile ${isCurrent&&p.locationMode==="bossRoom"?"me":""}" style="border-color:#e11d48;background:#3b1725">
      <b>👑 BOSS ROOM</b><span class="small">${region.boss.icon} ${region.boss.name}</span>
-     ${G.players.map((pl,i)=>playerIsAtBossRoom(pl,ri)?playerTokenHtml(i):"").join("")}
+     ${isCurrent&&p.locationMode==="bossRoom"?'<span class="token">🧙</span>':""}
    </div>
    <div class="box" style="margin-top:8px">🏘️ <b>Town</b> → Spaces 1–19 → 🔒 <b>Space 20: Boss Gate</b> → 👑 <b>Boss Room</b></div>`;
    if(ri<3){
@@ -781,7 +733,6 @@ function render(){
 $("collection").innerHTML=p.cards.map(c=>
    `<div class="cc">${c.monster[1]} <b>${c.monster[0]}</b><small>${c.rarity} · ${c.monster[5]} · ${c.monster[6]} ${p.equipment[lootSlot(c.monster)]===c?"· ✅ EQUIPPED":""}</small></div>`
  ).join("") || `<div class="cc">No cards yet — optional encounters are your chance to get stronger.</div>`;
- applyTurnLock();
 }
 
 function showMessage(t){$("msg").innerHTML=t;}
@@ -798,7 +749,6 @@ function rollFinalRoad(){
  $("dice").textContent=bonus?`🎲 ${base} + 💍1 = ${n}`:`🎲 ${n}`;
  $("roll").disabled=true;
  p.finalRoadPos+=n;
- syncMyMultiplayerState();
  if(p.finalRoadPos>=10){
    p.finalRoadPos=10;
    p.locationMode="finalBoss";
@@ -886,20 +836,6 @@ function fightFinalBoss(){
 
 function endTurn(){
  if(G.winner)return;
- if(G.multiplayer){
-   if(!isMyMultiplayerTurn())return;
-   $("roll").disabled=true;
-   $("fight").disabled=true;
-   $("pass").disabled=true;
-   $("retreat").disabled=true;
-   $("potion").disabled=true;
-   $("end").disabled=true;
-   syncMyMultiplayerState();
-   if(window.MQFirebase){
-     window.MQFirebase.endTurn(G.multiplayer.roomCode,G.multiplayer.playerIndex,multiplayerPlayerSnapshot(G.players[G.multiplayer.playerIndex]));
-   }
-   return;
- }
  G.active=0;
  const waitingAtGate=(G.phase==="atGate");
  const onRoad=(G.phase==="road");
@@ -1022,7 +958,6 @@ function completeBoardMovement(baseRoll){
  p.locationMode="board";
 
  render();
- syncMyMultiplayerState();
 
  if(newLocal===20){
    p.locationMode="gate";
@@ -1487,7 +1422,6 @@ function finishRoad(){
  p.roadRegion=null;p.roadPos=0;clearRoadPenalties(p);
  p.position=next*20;p.townRegion=next;
  p.locationMode="town";
- syncMyMultiplayerState();
  G.phase="move";
  $("roll").disabled=true;$("end").disabled=false;
  render();
@@ -1741,190 +1675,12 @@ function respawn(p){
   resetRunAfterDeath();
 }
 
-
-function showGameShell(){
- $("startScreen").style.display="none";
- $("bookScreen").style.display="none";
- $("gameShell").classList.remove("hiddenGame");
-}
-
-function defaultPlayerState(index){
- return {
-   name:index===0?"🔵 Player 1":"🔴 Player 2",
-   roadRegion:null,roadPos:0,roadPenalty:null,locationMode:"town",finalRoadPos:0,finalBossHits:0,
-   position:0,
-   hp:12,maxHp:12,
-   equipment:{weapon:null,armour:null,accessory:null},
-   cards:[],townRegion:0,
-   potions:0,rerolls:0,keys:[false,false,false,false],tempAttack:[0,0,0,0],
-   roadAttackPenalty:0,roadSlow:0,roadCap:0,
-   accessoryUsed:{briar:[false,false,false,false],heartwood:[false,false,false,false]},
-   accessoryUses:{},
-   visitedEvents:[[],[],[],[]]
- };
-}
-function multiplayerPlayerSnapshot(p){
- return {
-   position:p.position||0,
-   locationMode:p.locationMode||"town",
-   townRegion:p.townRegion||0,
-   roadRegion:p.roadRegion===undefined?null:p.roadRegion,
-   roadPos:p.roadPos||0,
-   finalRoadPos:p.finalRoadPos||0,
-   hp:p.hp,
-   maxHp:p.maxHp
- };
-}
-function isMyMultiplayerTurn(){
- if(!G || !G.multiplayer)return true;
- return G.active===G.multiplayer.playerIndex;
-}
-function applyTurnLock(){
- const banner=$("turnBanner");
- if(!G || !G.multiplayer){
-   if(banner)banner.style.display="none";
-   return;
- }
- if(banner){
-   banner.style.display="block";
-   if(isMyMultiplayerTurn()){
-     banner.className="turnBanner mine";
-     banner.textContent=`🎲 YOUR TURN · Player ${G.multiplayer.playerIndex+1}`;
-   }else{
-     banner.className="turnBanner wait";
-     banner.textContent=`⏳ WAITING FOR PLAYER ${G.active+1}`;
-   }
- }
- if(!isMyMultiplayerTurn()){
-   ["roll","fight","pass","retreat","potion","end"].forEach(id=>$(id).disabled=true);
- }
-}
-function syncMyMultiplayerState(){
- if(!G || !G.multiplayer || !window.MQFirebase)return;
- const idx=G.multiplayer.playerIndex;
- const p=G.players[idx];
- window.MQFirebase.syncPlayerState(G.multiplayer.roomCode,idx,multiplayerPlayerSnapshot(p));
-}
-function playerTokenHtml(index){
- return `<span class="playerToken p${index+1}">${index+1}</span>`;
-}
-function playerIsAtBoardSpace(p,ri,s){
- return currentRegionIndex(p)===ri &&
-        ((p.locationMode==="board" && localSpace(p)===s) ||
-         (p.locationMode==="gate" && s===20));
-}
-function playerIsAtTown(p,ri){
- return currentRegionIndex(p)===ri && p.locationMode==="town";
-}
-function playerIsAtBossRoom(p,ri){
- return currentRegionIndex(p)===ri && p.locationMode==="bossRoom";
-}
-
-function sharedWorldState(){
- return {
-   regionOrder:JSON.parse(JSON.stringify(G.regionOrder)),
-   worldEvents:JSON.parse(JSON.stringify(G.worldEvents)),
-   monsterTiles:JSON.parse(JSON.stringify(G.monsterTiles)),
-   roads:JSON.parse(JSON.stringify(G.roads))
- };
-}
-function updateRoomBadge(){
- const badge=$("roomBadge");
- if(!badge)return;
- if(G&&G.multiplayer){
-   badge.style.display="block";
-   badge.innerHTML=`🌐 Room <b>${G.multiplayer.roomCode}</b> · Player ${G.multiplayer.playerIndex+1}`;
- }else{
-   badge.style.display="none"; badge.innerHTML="";
- }
-}
-function loadSharedWorldState(world,roomCode,role,playerIndex,roomPlayers,activePlayer){
- newGame();
- G.regionOrder=JSON.parse(JSON.stringify(world.regionOrder));
- G.worldEvents=JSON.parse(JSON.stringify(world.worldEvents));
- G.monsterTiles=JSON.parse(JSON.stringify(world.monsterTiles));
- G.roads=JSON.parse(JSON.stringify(world.roads));
-
- G.players=[defaultPlayerState(0),defaultPlayerState(1)];
- if(roomPlayers){
-   [0,1].forEach(i=>{
-     const rp=roomPlayers[i] || roomPlayers[String(i)];
-     if(rp)Object.assign(G.players[i],rp.state||{});
-   });
- }
- G.active=activePlayer??0;
- G.multiplayer={roomCode,role,playerIndex};
-
- render(); showGameShell(); updateRoomBadge(); applyTurnLock();
-
- showMessage(`🌐 <b>Room ${roomCode}</b><br>You are <b>Player ${playerIndex+1}</b>.<br><br>${isMyMultiplayerTurn()?"🎲 It is your turn.":"⏳ Waiting for the other player."}`);
-}
-function applyRemoteRoomState(room){
- if(!G || !G.multiplayer || !room)return;
-
- if(room.players){
-   [0,1].forEach(i=>{
-     const rp=room.players[i] || room.players[String(i)];
-     if(rp && rp.state){
-       Object.assign(G.players[i],rp.state);
-     }
-   });
- }
-
- const previousActive=G.active;
- G.active=room.activePlayer??0;
-
- if(previousActive!==G.active && isMyMultiplayerTurn()){
-   G.phase="move";
-   G.encounter=null;
-   G.boss=null;
-   $("fight").disabled=true;
-   $("pass").disabled=true;
-   $("retreat").disabled=true;
-   $("end").disabled=true;
-   $("roll").disabled=false;
-   $("fight").textContent="⚔️ Fight";
-   hideMonsterCard();
-   hide("boss");
- }
-
- render();
- applyTurnLock();
-}
-
-
-window.MQMultiplayerBridge={
- createHostWorld(){ newGame(); showGameShell(); return sharedWorldState(); },
- loadRoom(world,roomCode,role,playerIndex,roomPlayers,activePlayer){
-   loadSharedWorldState(world,roomCode,role,playerIndex,roomPlayers,activePlayer);
- },
- applyRemoteRoom(room){ applyRemoteRoomState(room); },
- setHostRoom(roomCode,roomPlayers,activePlayer){
-   G.players=[defaultPlayerState(0),defaultPlayerState(1)];
-   if(roomPlayers){
-     [0,1].forEach(i=>{
-       const rp=roomPlayers[i] || roomPlayers[String(i)];
-       if(rp && rp.state)Object.assign(G.players[i],rp.state);
-     });
-   }
-   G.active=activePlayer??0;
-   G.multiplayer={roomCode,role:"host",playerIndex:0};
-   updateRoomBadge(); render(); applyTurnLock();
-   showMessage(`🌐 <b>Room created.</b><br>Room code: <b>${roomCode}</b><br><br>You are 🔵 <b>Player 1</b>. Send the code to Player 2.`);
- },
- setStatus(text,isError=false){
-   const el=$("multiplayerStatus");
-   if(el){el.textContent=text;el.style.color=isError?"#fca5a5":"#cbd5e1";}
- },
- getRoomInput(){return ($("roomCodeInput").value||"").trim().toUpperCase();}
-};
-
-$("roll").onclick=()=>{if(!isMyMultiplayerTurn())return;rollToMove();};
-$("fight").onclick=()=>{if(!isMyMultiplayerTurn())return;return G.phase==="encounter"?fightOptional():G.phase==="gateChoiceKey"?enterBossWithKey():G.phase==="gate"?rollBossGate():G.phase==="finalBoss"?fightFinalBoss():fightBoss();};
+$("roll").onclick=rollToMove;
+$("fight").onclick=()=>G.phase==="encounter"?fightOptional():G.phase==="gateChoiceKey"?enterBossWithKey():G.phase==="gate"?rollBossGate():G.phase==="finalBoss"?fightFinalBoss():fightBoss();
 $("pass").onclick=passEncounter;
 $("retreat").onclick=returnToTown;
 $("potion").onclick=usePotion;
-$("end").onclick=()=>{if(!isMyMultiplayerTurn())return;endTurn();};
+$("end").onclick=endTurn;
 $("new").onclick=newGame;
 $("menu").onclick=showStartScreen;
 
@@ -1976,34 +1732,15 @@ function showStartScreen(){
 }
 $("startGameBtn").onclick=()=>{
  newGame();
- G.multiplayer=null;
- showGameShell();
- updateRoomBadge();
+ $("startScreen").style.display="none";
+ $("bookScreen").style.display="none";
+ $("gameShell").classList.remove("hiddenGame");
 };
 $("openBookBtn").onclick=()=>{
  $("startScreen").style.display="none";
  $("bookScreen").style.display="block";
  renderMenuBook();
 };
-
-$("createRoomBtn").onclick=async()=>{
- if(!window.MQFirebase){window.MQMultiplayerBridge.setStatus("Firebase is still loading.",true);return;}
- try{
-  $("createRoomBtn").disabled=true;
-  const code=await window.MQFirebase.createRoom();
-  window.MQMultiplayerBridge.setStatus(`Room ${code} created.`);
- }catch(err){console.error(err);window.MQMultiplayerBridge.setStatus(`Could not create room: ${err.message}`,true);}
- finally{$("createRoomBtn").disabled=false;}
-};
-$("joinRoomBtn").onclick=async()=>{
- if(!window.MQFirebase){window.MQMultiplayerBridge.setStatus("Firebase is still loading.",true);return;}
- const code=window.MQMultiplayerBridge.getRoomInput();
- if(code.length!==6){window.MQMultiplayerBridge.setStatus("Enter the 6-character room code.",true);return;}
- try{$("joinRoomBtn").disabled=true;await window.MQFirebase.joinRoom(code);}
- catch(err){console.error(err);window.MQMultiplayerBridge.setStatus(`Could not join room: ${err.message}`,true);}
- finally{$("joinRoomBtn").disabled=false;}
-};
-
 $("closeBookBtn").onclick=showStartScreen;
 $("menuResetBook").onclick=()=>{
  if(confirm("Reset all Collection Book discoveries?")){
@@ -3571,145 +3308,5 @@ function setEncounterMode(on){
 showStartScreen();
 
 </script>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
-import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
-import { getDatabase, ref, set, get, update, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-database.js";
-
-const firebaseConfig={
- apiKey:"AIzaSyAtwbGSF7wOUJEmeRQWT3UoY1HX43cobeA",
- authDomain:"monster-quest-5f1d3.firebaseapp.com",
- databaseURL:"https://monster-quest-5f1d3-default-rtdb.firebaseio.com",
- projectId:"monster-quest-5f1d3",
- storageBucket:"monster-quest-5f1d3.firebasestorage.app",
- messagingSenderId:"213110140499",
- appId:"1:213110140499:web:7de4ffb83ce44176bfe0a6",
- measurementId:"G-RLFTTPPN00"
-};
-
-const app=initializeApp(firebaseConfig);
-const auth=getAuth(app);
-const db=getDatabase(app);
-let authPromise=null;
-let stopRoomListener=null;
-
-async function ensureSignedIn(){
- if(auth.currentUser)return auth.currentUser;
- if(!authPromise)authPromise=signInAnonymously(auth).then(r=>r.user);
- return authPromise;
-}
-function makeRoomCode(){
- const alphabet="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
- let code="";
- for(let i=0;i<6;i++)code+=alphabet[Math.floor(Math.random()*alphabet.length)];
- return code;
-}
-async function uniqueRoomCode(){
- for(let i=0;i<12;i++){
-  const code=makeRoomCode();
-  const snap=await get(ref(db,`rooms/${code}`));
-  if(!snap.exists())return code;
- }
- throw new Error("Could not generate a unique room code.");
-}
-function basicPlayer(index,uid=null){
- return {
-   uid,
-   connected:!!uid,
-   state:{
-     position:0,
-     locationMode:"town",
-     townRegion:0,
-     roadRegion:null,
-     roadPos:0,
-     finalRoadPos:0,
-     hp:12,
-     maxHp:12
-   }
- };
-}
-function listenToRoom(code){
- if(stopRoomListener)stopRoomListener();
- stopRoomListener=onValue(ref(db,`rooms/${code}`),snap=>{
-   if(!snap.exists())return;
-   window.MQMultiplayerBridge.applyRemoteRoom(snap.val());
- });
-}
-
-window.MQFirebase={
- async createRoom(){
-  const user=await ensureSignedIn();
-  const code=await uniqueRoomCode();
-  const world=window.MQMultiplayerBridge.createHostWorld();
-
-  const players={
-    0:basicPlayer(0,user.uid),
-    1:basicPlayer(1,null)
-  };
-
-  await set(ref(db,`rooms/${code}`),{
-    version:2,
-    createdAt:Date.now(),
-    status:"waiting",
-    activePlayer:0,
-    world,
-    players
-  });
-
-  window.MQMultiplayerBridge.setHostRoom(code,players,0);
-  listenToRoom(code);
-  return code;
- },
-
- async joinRoom(code){
-  const user=await ensureSignedIn();
-  const roomRef=ref(db,`rooms/${code}`);
-  const snap=await get(roomRef);
-
-  if(!snap.exists())throw new Error("Room not found.");
-  const room=snap.val();
-  if(!room.world)throw new Error("Room has no shared board data.");
-
-  const p2=room.players?.[1] || room.players?.["1"];
-  if(p2?.uid && p2.uid!==user.uid)throw new Error("Room already has two players.");
-
-  await update(ref(db,`rooms/${code}/players/1`),basicPlayer(1,user.uid));
-  await update(roomRef,{status:"ready"});
-
-  const refreshed=(await get(roomRef)).val();
-  window.MQMultiplayerBridge.loadRoom(refreshed.world,code,"guest",1,refreshed.players,refreshed.activePlayer);
-  listenToRoom(code);
-  window.MQMultiplayerBridge.setStatus(`Joined room ${code} as Player 2.`);
- },
-
- async syncPlayerState(code,index,state){
-  await update(ref(db,`rooms/${code}/players/${index}/state`),state);
- },
-
- async endTurn(code,index,state){
-  await update(ref(db,`rooms/${code}/players/${index}/state`),state);
-
-  const activeRef=ref(db,`rooms/${code}/activePlayer`);
-  const result=await runTransaction(activeRef,current=>{
-    if(current===index)return index===0?1:0;
-    return current;
-  });
-
-  if(!result.committed){
-    throw new Error("Turn switch failed.");
-  }
- }
-};
-
-try{
- await ensureSignedIn();
- window.MQMultiplayerBridge.setStatus("Firebase connected. Multiplayer Stage 2A ready.");
-}catch(err){
- console.error(err);
- window.MQMultiplayerBridge.setStatus(`Firebase connection failed: ${err.message}`,true);
-}
-</script>
-
 </body>
 </html>
