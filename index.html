@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Monster Quest v3.9.0</title>
+<title>Monster Quest v3.9.1</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#f8fafc;font-family:system-ui,sans-serif}.wrap{max-width:1400px;margin:auto;padding:20px}
 .grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px}.panel{background:#162033;border:1px solid #334155;border-radius:16px;padding:16px}
@@ -200,7 +200,7 @@ aside.panel{padding:8px;display:flex;flex-direction:column;gap:4px}
       </div>
       <div id="multiplayerStatus">Connecting to Firebase...</div>
     </div>
-    <div class="small" style="margin-top:18px">Multiplayer Stage 2B v3.9.0 · Collection progress saves in this browser</div>
+    <div class="small" style="margin-top:18px">Multiplayer Stage 2B.1 v3.9.1 · Collection progress saves in this browser</div>
   </div>
 </div>
 
@@ -216,7 +216,7 @@ aside.panel{padding:8px;display:flex;flex-direction:column;gap:4px}
 </div>
 
 <div id="gameShell" class="wrap gameShell hiddenGame">
-<h1>🎲 Monster Quest v3.9.0</h1>
+<h1>🎲 Monster Quest v3.9.1</h1>
 <div class="sub">Accessory effects active — Silkweave, Spore, Briar and Heartwood now work; Road penalties clear at Town.</div>
 <div class="grid">
 <main class="panel"><h2>🗺️ Shared World</h2><div id="world"></div></main>
@@ -1434,6 +1434,8 @@ function fightOptional(){
      render();
      showMessage(`${accessoryNote?accessoryNote+"<br>":""}💥 <b>You lost to ${e.monster[0]}.</b> You take ${damage} damage.<br><br>Press <b>➡️ End Turn</b> when ready.`);
      $("end").disabled=false;
+     // Send HP + ended encounter together so Player 2 sees the damage instantly
+     // and neither browser can restore the old Fight/Pass state.
      syncMultiplayerAll();
    }
  }
@@ -1849,8 +1851,15 @@ function syncMultiplayerTurnState(){
  window.MQFirebase.syncTurnState(G.multiplayer.roomCode,multiplayerTurnSnapshot());
 }
 function syncMultiplayerAll(){
- syncMyMultiplayerState();
- syncMultiplayerTurnState();
+ if(!G || !G.multiplayer || !window.MQFirebase || !isMyMultiplayerTurn())return;
+ const idx=G.multiplayer.playerIndex;
+ const p=G.players[idx];
+ window.MQFirebase.syncAction(
+   G.multiplayer.roomCode,
+   idx,
+   multiplayerPlayerSnapshot(p),
+   multiplayerTurnSnapshot()
+ );
 }
 function renderMultiplayerPlayerCards(){
  const wrap=$("multiplayerPlayers");
@@ -1895,9 +1904,11 @@ function applyTurnLock(){
      banner.textContent=`⏳ WAITING FOR PLAYER ${G.active+1}`;
    }
  }
- if(!isMyMultiplayerTurn()){
+ const myTurn=isMyMultiplayerTurn();
+ if(!myTurn){
    ["roll","fight","pass","retreat","potion","end"].forEach(id=>$(id).disabled=true);
  }
+ document.querySelectorAll("#msg button").forEach(btn=>btn.disabled=!myTurn);
 }
 function syncMyMultiplayerState(){
  if(!G || !G.multiplayer || !window.MQFirebase)return;
@@ -1962,20 +1973,29 @@ function loadSharedWorldState(world,roomCode,role,playerIndex,roomPlayers,active
 function applyRemoteRoomState(room){
  if(!G || !G.multiplayer || !room)return;
 
+ // Player stats are always safe to mirror immediately.
  if(room.players){
    [0,1].forEach(i=>{
      const rp=room.players[i] || room.players[String(i)];
      if(rp && rp.state){
-       // Replace with a deep copy so cards/equipment/arrays stay clean.
        G.players[i]=Object.assign(defaultPlayerState(i),JSON.parse(JSON.stringify(rp.state)));
      }
    });
  }
 
  const previousActive=G.active;
- G.active=room.activePlayer??0;
+ const nextActive=room.activePlayer??0;
+ G.active=nextActive;
 
- if(room.turnState){
+ const myIndex=G.multiplayer.playerIndex;
+ const amActivePlayer=(nextActive===myIndex);
+ const turnChanged=(previousActive!==nextActive);
+
+ // Important:
+ // While I am the active player, my local browser owns its encounter controls.
+ // Firebase echoes must not restore an older encounter phase and freeze the UI.
+ // The waiting player's browser DOES mirror the shared encounter/message/card.
+ if(room.turnState && (!amActivePlayer || turnChanged)){
    G.phase=room.turnState.phase||"move";
    G.encounter=room.turnState.encounter||null;
    G.boss=room.turnState.boss||null;
@@ -1991,27 +2011,26 @@ function applyRemoteRoomState(room){
    }
 
    if((G.phase==="boss" || G.phase==="gate" || G.phase==="gateChoiceKey" || G.phase==="finalBoss") && G.boss){
-     // The active player's browser owns interaction. Waiting player sees shared phase/message.
-     if(!isMyMultiplayerTurn()) hide("boss");
+     if(!amActivePlayer)hide("boss");
    }
  }
 
- if(previousActive!==G.active && isMyMultiplayerTurn()){
-   // New active player begins a clean movement turn unless a shared phase says otherwise.
-   if(!room.turnState || room.turnState.phase==="move"){
-     G.phase="move";
-     G.encounter=null;
-     G.boss=null;
-     $("fight").disabled=true;
-     $("pass").disabled=true;
-     $("retreat").disabled=true;
-     $("end").disabled=true;
-     $("roll").disabled=false;
-     $("fight").textContent="⚔️ Fight";
-     hideMonsterCard();
-     hide("boss");
-     showMessage(`🎲 <b>Your turn.</b><br>Roll to move.`);
-   }
+ // A real turn change gives the newly active player a clean movement turn.
+ if(turnChanged && amActivePlayer){
+   G.phase="move";
+   G.encounter=null;
+   G.boss=null;
+   G.pendingEquip=null;
+   $("fight").disabled=true;
+   $("pass").disabled=true;
+   $("retreat").disabled=true;
+   $("end").disabled=true;
+   $("roll").disabled=false;
+   $("fight").textContent="⚔️ Fight";
+   hideMonsterCard();
+   hide("boss");
+   $("dice").textContent="🎲";
+   showMessage(`🎲 <b>Your turn.</b><br>Roll to move.`);
  }
 
  render();
@@ -3836,16 +3855,28 @@ window.MQFirebase={
   await set(ref(db,`rooms/${code}/turnState`),turnState);
  },
 
+ async syncAction(code,index,state,turnState){
+  // One atomic room update prevents the observer from receiving new HP
+  // paired with an old encounter phase.
+  const roomRef=ref(db,`rooms/${code}`);
+  await update(roomRef,{
+    [`players/${index}/state`]:state,
+    turnState
+  });
+ },
+
  async endTurn(code,index,state){
-  await set(ref(db,`rooms/${code}/players/${index}/state`),state);
-  await set(ref(db,`rooms/${code}/turnState`),{
-    phase:"move",
-    encounter:null,
-    boss:null,
-    winner:null,
-    diceText:"🎲",
-    message:`Player ${index===0?2:1}'s turn.`,
-    cardVisible:false
+  await update(ref(db,`rooms/${code}`),{
+    [`players/${index}/state`]:state,
+    turnState:{
+      phase:"move",
+      encounter:null,
+      boss:null,
+      winner:null,
+      diceText:"🎲",
+      message:`Player ${index===0?2:1}'s turn.`,
+      cardVisible:false
+    }
   });
 
   const activeRef=ref(db,`rooms/${code}/activePlayer`);
@@ -3862,7 +3893,7 @@ window.MQFirebase={
 
 try{
  await ensureSignedIn();
- window.MQMultiplayerBridge.setStatus("Firebase connected. Multiplayer Stage 2B ready.");
+ window.MQMultiplayerBridge.setStatus("Firebase connected. Multiplayer Stage 2B.1 ready.");
 }catch(err){
  console.error(err);
  window.MQMultiplayerBridge.setStatus(`Firebase connection failed: ${err.message}`,true);
