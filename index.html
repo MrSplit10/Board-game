@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Monster Quest v3.9.2</title>
+<title>Monster Quest v3.9.3</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#f8fafc;font-family:system-ui,sans-serif}.wrap{max-width:1400px;margin:auto;padding:20px}
 .grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px}.panel{background:#162033;border:1px solid #334155;border-radius:16px;padding:16px}
@@ -200,7 +200,7 @@ aside.panel{padding:8px;display:flex;flex-direction:column;gap:4px}
       </div>
       <div id="multiplayerStatus">Connecting to Firebase...</div>
     </div>
-    <div class="small" style="margin-top:18px">Multiplayer Stage 2B.2 v3.9.2 · Collection progress saves in this browser</div>
+    <div class="small" style="margin-top:18px">Multiplayer Stage 2B.3 v3.9.3 · Collection progress saves in this browser</div>
   </div>
 </div>
 
@@ -216,7 +216,7 @@ aside.panel{padding:8px;display:flex;flex-direction:column;gap:4px}
 </div>
 
 <div id="gameShell" class="wrap gameShell hiddenGame">
-<h1>🎲 Monster Quest v3.9.2</h1>
+<h1>🎲 Monster Quest v3.9.3</h1>
 <div class="sub">Accessory effects active — Silkweave, Spore, Briar and Heartwood now work; Road penalties clear at Town.</div>
 <div class="grid">
 <main class="panel"><h2>🗺️ Shared World</h2><div id="world"></div></main>
@@ -831,6 +831,7 @@ function rollFinalRoad(){
  if(p.finalRoadPos>=10){
    p.finalRoadPos=10;
    p.locationMode="finalBoss";
+   p.turnPhase="finalBoss";
    G.phase="finalBoss";
    render();
    beginFinalBoss();
@@ -845,6 +846,7 @@ function beginFinalBoss(){ setEncounterMode(false);
  const p=player();
  G.phase="finalBoss";
  p.locationMode="finalBoss";
+ p.turnPhase="finalBoss";
  $("roll").disabled=true;
  $("fight").disabled=false;
  $("fight").textContent="🐉 Fight Final Boss";
@@ -972,6 +974,7 @@ function rollToMove(){
  // Leaving Victory Road commits the player to the final route.
  if(G.phase==="victoryRoad"){
    p.locationMode="finalRoad";
+   p.turnPhase="finalRoad";
    p.finalRoadPos=0;
    G.phase="finalRoad";
    rollFinalRoad();
@@ -1075,6 +1078,7 @@ function completeBoardMovement(baseRoll){
 
  p.position=region*20+newLocal;
  p.locationMode="board";
+ p.turnPhase="move";
 
  // Resolve the landing FIRST. Firebase receives the completed result afterwards.
  if(newLocal===20){
@@ -1487,6 +1491,7 @@ function enterRoadOfDefeat(region){
  const p=player();
  p.roadRegion=region;p.roadPos=0;p.roadPenalty=null;
  p.locationMode="road";
+ p.turnPhase="road";
  G.phase="road";
  $("roll").disabled=true;$("fight").disabled=true;$("pass").disabled=true;$("retreat").disabled=true;$("end").disabled=false;
  render();
@@ -1565,6 +1570,7 @@ function finishRoad(){
  p.roadRegion=null;p.roadPos=0;clearRoadPenalties(p);
  p.position=next*20;p.townRegion=next;
  p.locationMode="town";
+ p.turnPhase="move";
  syncMyMultiplayerState();
  G.phase="move";
  $("roll").disabled=true;$("end").disabled=false;
@@ -1621,6 +1627,7 @@ function returnToTown(){
  p.position=ri*20;
  p.townRegion=ri;
  p.locationMode="town";
+ p.turnPhase="move";
  clearRoadPenalties(p);
  G.phase="move";
  hide("boss");
@@ -1642,8 +1649,16 @@ function rollBossGate(){
    beginBoss();
    render();
  }else{
-   G.phase="atGate";$("fight").disabled=true;$("fight").textContent="⚔️ Fight";$("end").disabled=false;
-   showMessage(`🔒 <b>Gate roll failed.</b> You rolled ${n}; you needed 5+. You remain at the gate.<br><br>Press <b>➡️ End Turn</b>. On your next turn, your single dice roll will be the gate attempt.`);
+   G.phase="atGate";
+   const p=player();
+   p.turnPhase="atGate";
+   p.locationMode="gate";
+   $("fight").disabled=true;
+   $("fight").textContent="⚔️ Fight";
+   $("end").disabled=false;
+   $("roll").disabled=true;
+   showMessage(`🔒 <b>Gate roll failed.</b> You rolled ${n}; you needed 5+. You remain at the gate.<br><br>Press <b>➡️ End Turn</b>. On your next turn, your single dice roll will be another gate attempt.`);
+   syncMultiplayerAll();
  }
 }
 
@@ -1694,6 +1709,7 @@ function fightBoss(){
 
    if(ri===3){
      p.locationMode="victoryRoad";
+     p.turnPhase="victoryRoad";
      p.finalRoadPos=0;
      p.finalBossHits=0;
      G.phase="victoryRoad";
@@ -1712,6 +1728,7 @@ function fightBoss(){
    p.position=nextRegion*20;
    p.townRegion=nextRegion;
    p.locationMode="town";
+   p.turnPhase="move";
    p.roadRegion=null;
    p.roadPos=0;
    clearRoadPenalties(p);
@@ -1760,6 +1777,7 @@ function resetRunAfterDeath(){
     G.players[idx]=defaultPlayerState(idx);
     G.book=savedBook;
     G.phase="move";
+    G.players[idx].turnPhase="move";
     G.encounter=null;
     G.boss=null;
     G.pendingEquip=null;
@@ -1827,6 +1845,7 @@ function showGameShell(){
 function defaultPlayerState(index){
  return {
    name:index===0?"🔵 Player 1":"🔴 Player 2",
+   turnPhase:"move",
    roadRegion:null,roadPos:0,roadPenalty:null,locationMode:"town",finalRoadPos:0,finalBossHits:0,
    position:0,
    hp:12,maxHp:12,
@@ -1845,6 +1864,7 @@ function multiplayerPlayerSnapshot(p){
  // Full JSON-safe gameplay state for Stage 2B.
  return JSON.parse(JSON.stringify({
    name:p.name,
+   turnPhase:(G && G.multiplayer && G.players[G.multiplayer.playerIndex]===p) ? G.phase : (p.turnPhase||"move"),
    roadRegion:p.roadRegion===undefined?null:p.roadRegion,
    roadPos:p.roadPos||0,
    roadPenalty:p.roadPenalty||null,
@@ -2008,6 +2028,60 @@ function loadSharedWorldState(world,roomCode,role,playerIndex,roomPlayers,active
 
  showMessage(`🌐 <b>Room ${roomCode}</b><br>You are <b>Player ${playerIndex+1}</b>.<br><br>${isMyMultiplayerTurn()?"🎲 It is your turn.":"⏳ Waiting for the other player."}`);
 }
+
+function restoreMultiplayerTurnForActivePlayer(){
+ if(!G || !G.multiplayer || !isMyMultiplayerTurn())return;
+
+ const p=player();
+ const phase=p.turnPhase||"move";
+ G.phase=phase;
+ G.encounter=null;
+ G.boss=null;
+ G.pendingEquip=null;
+
+ $("fight").textContent="⚔️ Fight";
+ $("fight").disabled=true;
+ $("pass").disabled=true;
+ $("retreat").disabled=true;
+ $("potion").disabled=!(p.potions>0 && p.hp<p.maxHp);
+ $("end").disabled=true;
+ $("roll").disabled=true;
+
+ hideMonsterCard();
+ hide("boss");
+ $("dice").textContent="🎲";
+
+ if(phase==="atGate"){
+   p.locationMode="gate";
+   $("roll").disabled=false;
+   $("retreat").disabled=false;
+   showMessage(`🔒 <b>You are waiting at the Boss Gate.</b><br>Your one roll this turn is another gate attempt. Roll <b>5+</b> to enter.`);
+ }
+ else if(phase==="road"){
+   $("roll").disabled=false;
+   showMessage(`☠️ <b>Road of Defeat.</b><br>Roll once to continue toward the next Town.`);
+ }
+ else if(phase==="victoryRoad"){
+   $("roll").disabled=false;
+   showMessage(`🏁 <b>Victory Road.</b><br>Your next roll begins the final route. Once you leave, there is no retreat.`);
+ }
+ else if(phase==="finalRoad"){
+   $("roll").disabled=false;
+   showMessage(`🐉 <b>Final Boss Region.</b><br>Roll once to continue toward the Ancient Dragon.`);
+ }
+ else if(phase==="finalBoss"){
+   $("fight").disabled=false;
+   $("fight").textContent="🐉 Fight Final Boss";
+   showMessage(`🐉 <b>Final Boss battle.</b><br>Attack the Ancient Dragon.`);
+ }
+ else{
+   p.turnPhase="move";
+   G.phase="move";
+   $("roll").disabled=false;
+   showMessage(`🎲 <b>Your turn.</b><br>Roll to move.`);
+ }
+}
+
 function applyRemoteRoomState(room){
  if(!G || !G.multiplayer || !room)return;
 
@@ -2054,22 +2128,9 @@ function applyRemoteRoomState(room){
    }
  }
 
- // A real turn change gives the newly active player a clean movement turn.
+ // Restore this player's own persistent phase when their turn comes back.
  if(turnChanged && amActivePlayer){
-   G.phase="move";
-   G.encounter=null;
-   G.boss=null;
-   G.pendingEquip=null;
-   $("fight").disabled=true;
-   $("pass").disabled=true;
-   $("retreat").disabled=true;
-   $("end").disabled=true;
-   $("roll").disabled=false;
-   $("fight").textContent="⚔️ Fight";
-   hideMonsterCard();
-   hide("boss");
-   $("dice").textContent="🎲";
-   showMessage(`🎲 <b>Your turn.</b><br>Roll to move.`);
+   restoreMultiplayerTurnForActivePlayer();
  }
 
  render();
@@ -3800,6 +3861,7 @@ async function uniqueRoomCode(){
 function firebaseDefaultState(index){
  return {
    name:index===0?"🔵 Player 1":"🔴 Player 2",
+   turnPhase:"move",
    roadRegion:null,
    roadPos:0,
    roadPenalty:null,
@@ -3905,6 +3967,8 @@ window.MQFirebase={
  },
 
  async endTurn(code,index,state){
+  // `state.turnPhase` persists the ending player's own location flow
+  // (for example atGate or road) until their next turn.
   await update(ref(db,`rooms/${code}`),{
     [`players/${index}/state`]:state,
     turnState:{
@@ -3932,7 +3996,7 @@ window.MQFirebase={
 
 try{
  await ensureSignedIn();
- window.MQMultiplayerBridge.setStatus("Firebase connected. Multiplayer Stage 2B.2 ready.");
+ window.MQMultiplayerBridge.setStatus("Firebase connected. Multiplayer Stage 2B.3 ready.");
 }catch(err){
  console.error(err);
  window.MQMultiplayerBridge.setStatus(`Firebase connection failed: ${err.message}`,true);
