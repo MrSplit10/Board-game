@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Monster Quest v3.9.3</title>
+<title>Monster Quest v3.9.4</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#f8fafc;font-family:system-ui,sans-serif}.wrap{max-width:1400px;margin:auto;padding:20px}
 .grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px}.panel{background:#162033;border:1px solid #334155;border-radius:16px;padding:16px}
@@ -200,7 +200,7 @@ aside.panel{padding:8px;display:flex;flex-direction:column;gap:4px}
       </div>
       <div id="multiplayerStatus">Connecting to Firebase...</div>
     </div>
-    <div class="small" style="margin-top:18px">Multiplayer Stage 2B.3 v3.9.3 · Collection progress saves in this browser</div>
+    <div class="small" style="margin-top:18px">Multiplayer Stage 2B.4 v3.9.4 · Collection progress saves in this browser</div>
   </div>
 </div>
 
@@ -216,7 +216,7 @@ aside.panel{padding:8px;display:flex;flex-direction:column;gap:4px}
 </div>
 
 <div id="gameShell" class="wrap gameShell hiddenGame">
-<h1>🎲 Monster Quest v3.9.3</h1>
+<h1>🎲 Monster Quest v3.9.4</h1>
 <div class="sub">Accessory effects active — Silkweave, Spore, Briar and Heartwood now work; Road penalties clear at Town.</div>
 <div class="grid">
 <main class="panel"><h2>🗺️ Shared World</h2><div id="world"></div></main>
@@ -1126,32 +1126,40 @@ function completeBoardMovement(baseRoll){
  syncMultiplayerAll();
 }
 
+
+function monsterRegionBonus(runRegionIndex){
+  return [0,0,1,2][runRegionIndex] ?? 0;
+}
+
 function drawFreshMonster(region){
 
-  const regionData = REGIONS[G.regionOrder[region]];
-  const card = drawRegionMonster(regionData.name);
+  // `region` is the player's position in the current four-region run:
+  // 0 = Region 1, 1 = Region 2, 2 = Region 3, 3 = Region 4.
+  const runRegionIndex=Math.max(0,Math.min(3,Number(region)||0));
+  const regionData=REGIONS[G.regionOrder[runRegionIndex]];
+  const card=drawRegionMonster(regionData.name);
 
   if(card){
-    let rarity = "COMMON";
-    if(card.rarity.includes("LEGENDARY")) rarity = "LEGENDARY";
-    else if(card.rarity.includes("UNCOMMON")) rarity = "UNCOMMON";
-    else if(card.rarity.includes("RARE")) rarity = "RARE";
+    let rarity="COMMON";
+    if(card.rarity.includes("LEGENDARY")) rarity="LEGENDARY";
+    else if(card.rarity.includes("UNCOMMON")) rarity="UNCOMMON";
+    else if(card.rarity.includes("RARE")) rarity="RARE";
 
-    const baseDifficulty = parseInt(card.roll);
-    const regionBonus = [0, 0, 1, 2][region] ?? 0;
-    const difficulty = baseDifficulty + regionBonus;
-    const damage = parseInt(card.damage);
+    const baseDifficulty=parseInt(card.roll);
+    const regionBonus=monsterRegionBonus(runRegionIndex);
+    const difficulty=baseDifficulty+regionBonus;
+    const damage=parseInt(card.damage);
 
-    let attackBonus = 0;
-    let hpBonus = 0;
+    let attackBonus=0;
+    let hpBonus=0;
 
-    const attackMatch = card.itemEffect.match(/\+(\d+)\s*Attack/i);
-    const hpMatch = card.itemEffect.match(/\+(\d+)\s*Max HP/i);
+    const attackMatch=card.itemEffect.match(/\+(\d+)\s*Attack/i);
+    const hpMatch=card.itemEffect.match(/\+(\d+)\s*Max HP/i);
 
-    if(attackMatch) attackBonus = parseInt(attackMatch[1]);
-    if(hpMatch) hpBonus = parseInt(hpMatch[1]);
+    if(attackMatch)attackBonus=parseInt(attackMatch[1]);
+    if(hpMatch)hpBonus=parseInt(hpMatch[1]);
 
-    const legacyMonster = [
+    const legacyMonster=[
       card.name,
       "👾",
       rarity,
@@ -1164,30 +1172,47 @@ function drawFreshMonster(region){
       card.itemType
     ];
 
+    // Never mutate the permanent CARD_MONSTERS definition.
+    // This copy is only for the currently drawn encounter and displays
+    // the scaled roll requirement on the picture card.
+    const scaledCard={
+      ...card,
+      baseRoll:card.roll,
+      roll:`${difficulty}+`,
+      regionBonus
+    };
+
     return {
-      monster: legacyMonster,
-      cardData: card,
+      monster:legacyMonster,
+      cardData:scaledCard,
       rarity,
+      baseDifficulty,
+      regionBonus,
       difficulty,
-      space: localSpace(player())
+      space:localSpace(player()),
+      runRegionIndex
     };
   }
 
-  // Emergency fallback so landing on a monster tile can never lock the game.
-  const m = MONSTERS[Math.floor(Math.random()*MONSTERS.length)];
-  const rarity = chooseRarity();
-  const difficulty = {COMMON:3,UNCOMMON:4,RARE:5,LEGENDARY:6}[rarity];
+  // Emergency fallback for any region missing a card pool.
+  const m=MONSTERS[Math.floor(Math.random()*MONSTERS.length)];
+  const rarity=chooseRarity();
+  const baseDifficulty={COMMON:3,UNCOMMON:4,RARE:5,LEGENDARY:6}[rarity];
+  const regionBonus=monsterRegionBonus(runRegionIndex);
+  const difficulty=baseDifficulty+regionBonus;
 
-  console.warn("Using emergency monster fallback for region:", regionData.name);
+  console.warn("Using emergency monster fallback for region:",regionData.name);
 
   return {
     monster:m,
     rarity,
+    baseDifficulty,
+    regionBonus,
     difficulty,
-    space:localSpace(player())
+    space:localSpace(player()),
+    runRegionIndex
   };
 }
-
 function resolveBoardEvent(ev,p,region){
  ensureVisitedEvents(p);
  $("roll").disabled=true;$("end").disabled=false;
@@ -1341,7 +1366,10 @@ function beginOptionalEncounter(e){
   $("fight").disabled=false;
   $("pass").disabled=false;
 
-  showMessage(`${newlyDiscovered?`📖 <b>NEW MONSTER DISCOVERED!</b><br>${e.monster[0]} was added to your Collection Book.<br><br>`:""}👾 <b>${e.monster[0]}</b> appeared on your space. Fight or pass.`);
+  const scalingText=e.regionBonus>0
+    ? `<br>📈 Region ${e.runRegionIndex+1} scaling: base ${e.baseDifficulty}+ → <b>${e.difficulty}+</b>.`
+    : "";
+  showMessage(`${newlyDiscovered?`📖 <b>NEW MONSTER DISCOVERED!</b><br>${e.monster[0]} was added to your Collection Book.<br><br>`:""}👾 <b>${e.monster[0]}</b> appeared on your space.${scalingText}<br>Fight or pass.`);
   syncMultiplayerAll();
 }
 
@@ -3996,7 +4024,7 @@ window.MQFirebase={
 
 try{
  await ensureSignedIn();
- window.MQMultiplayerBridge.setStatus("Firebase connected. Multiplayer Stage 2B.3 ready.");
+ window.MQMultiplayerBridge.setStatus("Firebase connected. Multiplayer Stage 2B.4 ready.");
 }catch(err){
  console.error(err);
  window.MQMultiplayerBridge.setStatus(`Firebase connection failed: ${err.message}`,true);
