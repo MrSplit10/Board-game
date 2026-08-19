@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Monster Quest v4.3.0</title>
+<title>Monster Quest v4.3.6</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#f8fafc;font-family:system-ui,sans-serif}.wrap{max-width:1400px;margin:auto;padding:20px}
 .grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px}.panel{background:#162033;border:1px solid #334155;border-radius:16px;padding:16px}
@@ -1238,6 +1238,722 @@ button:hover:not(:disabled){filter:brightness(1.12)}
   display:none !important;
 }
 
+
+/* ==========================================================
+   STREAMLINED RIGHT HUD v4.3.1
+   ========================================================== */
+.controlPanel{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  padding:7px!important;
+  overflow-y:auto;
+  overflow-x:hidden;
+  scrollbar-width:thin;
+  min-width:0;
+}
+.controlPanel>*{min-width:0;max-width:100%}
+
+.multiplayerMode #players,
+.multiplayerMode .soloStatusBlock{
+  display:none!important;
+}
+
+#roomBadge{margin:0!important;padding:4px 7px!important}
+.turnBanner{
+  margin:0!important;
+  padding:5px 7px!important;
+  font-size:9px!important;
+  min-height:0!important;
+}
+.multiplayerPlayers{
+  gap:5px!important;
+  margin:0!important;
+}
+.playerHud{padding:6px!important}
+.playerHudHead{padding-bottom:3px!important;gap:6px!important}
+.playerPawnIcon{
+  width:22px!important;
+  height:22px!important;
+  font-size:14px!important;
+  flex:0 0 22px;
+}
+.playerHudHead b{font-size:9px!important}
+.playerHudHead span{font-size:6px!important}
+.hpBar{margin:4px 0!important;height:5px!important}
+.playerHudStats{font-size:7px!important;margin-bottom:3px!important}
+.gearRows{padding:2px 0!important}
+.gearRows div{font-size:7px!important;padding:1px 0!important}
+.playerHudFooter{font-size:7px!important;padding-top:2px!important}
+
+.soloStatusBlock{display:flex;flex-direction:column;gap:4px}
+.soloStatusBlock .stats{margin:0!important;gap:4px!important}
+.soloStatusBlock .stat{padding:4px!important;min-height:0!important}
+#quickInfo{
+  margin:0!important;
+  padding:4px 6px;
+  border:1px solid #343c45;
+  border-radius:5px;
+  background:#0d1319;
+  font-size:8px!important;
+  line-height:1.25;
+}
+#equipment{
+  margin:0!important;
+  padding:5px 6px!important;
+  font-size:8px!important;
+  line-height:1.3!important;
+}
+
+.actionHub{
+  border:1px solid #4c412f;
+  background:linear-gradient(180deg,#111820,#090e13);
+  border-radius:7px;
+  padding:5px;
+  box-shadow:inset 0 0 10px #0007;
+}
+.actionHubTop{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+  margin-bottom:4px;
+}
+.actionHubTitle{
+  font-family:Georgia,'Times New Roman',serif;
+  color:#d9c180;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:1.2px;
+}
+.actionHub #dice{
+  width:auto!important;
+  min-width:40px!important;
+  height:28px!important;
+  min-height:28px!important;
+  margin:0!important;
+  padding:2px 6px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  border-radius:5px!important;
+  font-size:14px!important;
+  line-height:1!important;
+  background:#e5dac0!important;
+  color:#181818!important;
+  border:1px solid #71613e!important;
+  box-shadow:inset 0 0 5px #8f7c5544,0 2px 5px #0008!important;
+  text-shadow:none!important;
+  position:static!important;
+  transform:none!important;
+}
+.actionButtons{
+  display:grid!important;
+  grid-template-columns:1fr 1fr;
+  gap:4px!important;
+  margin:0!important;
+}
+.actionButtons button{
+  width:100%!important;
+  min-width:0!important;
+  min-height:27px!important;
+  margin:0!important;
+  padding:4px 5px!important;
+  font-size:8px!important;
+  line-height:1.05!important;
+  white-space:normal;
+  overflow:hidden;
+}
+#roll,#end{grid-column:1 / -1}
+#new,#menu{
+  font-size:7px!important;
+  min-height:23px!important;
+  opacity:.82;
+}
+
+.streamlinedMsg{
+  margin:0!important;
+  padding:6px 7px!important;
+  font-size:8px!important;
+  line-height:1.3!important;
+  min-height:34px!important;
+  max-height:92px;
+  overflow:auto;
+  border-color:#45413a!important;
+}
+.streamlinedMsg button{
+  font-size:7px!important;
+  padding:3px 5px!important;
+  margin:3px 2px 0!important;
+}
+
+#boss{
+  margin:0!important;
+  padding:7px!important;
+  max-height:176px;
+  overflow:auto;
+  border-radius:7px!important;
+}
+#boss .big{
+  font-size:25px!important;
+  margin:0!important;
+  line-height:1!important;
+}
+#boss h2{
+  margin:3px 0!important;
+  font-size:14px!important;
+  line-height:1.05!important;
+}
+#boss p{
+  margin:3px 0!important;
+  font-size:8px!important;
+  line-height:1.25!important;
+}
+#boss .box{
+  margin:4px 0!important;
+  padding:5px!important;
+  font-size:8px!important;
+  line-height:1.25!important;
+}
+
+.compactDetails{margin:0!important}
+.compactDetails summary{
+  padding:5px 6px!important;
+  font-size:8px!important;
+  min-height:0!important;
+}
+.compactDetails[open]{
+  max-height:150px;
+  overflow:auto;
+}
+#collection{
+  max-height:120px;
+  overflow:auto;
+}
+#rulesDetails p{
+  font-size:7px!important;
+  line-height:1.3!important;
+}
+
+.controlPanel b,
+.controlPanel span,
+.controlPanel div,
+.controlPanel p{
+  overflow-wrap:anywhere;
+}
+.gearRows span{
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+
+@media(max-width:950px){
+  .controlPanel{max-height:none;overflow:visible}
+  .actionButtons{grid-template-columns:repeat(3,1fr)!important}
+  #roll,#end{grid-column:auto}
+}
+
+
+/* ==========================================================
+   BOARD DICE ARENA v4.3.2
+   ========================================================== */
+.boardDiceArena{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin:0 0 8px;
+  padding:7px 10px;
+  border:1px solid #5f5034;
+  border-radius:8px;
+  background:
+    radial-gradient(circle at 85% 50%,rgba(47,105,169,.18),transparent 26%),
+    linear-gradient(180deg,#10171e,#090e13);
+  box-shadow:inset 0 0 16px #0009,0 4px 14px #0006;
+}
+.boardDiceHeader{
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+}
+.boardDiceHeader span{
+  font-family:Georgia,'Times New Roman',serif;
+  color:#e3ca88;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:1.4px;
+}
+.boardDiceHeader small{
+  color:#8f9aa6;
+  font-size:7px;
+  margin-top:2px;
+}
+.boardDiceWell{
+  position:relative;
+  width:74px;
+  height:62px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  perspective:500px;
+  flex:0 0 74px;
+}
+.boardDie{
+  position:relative;
+  z-index:2;
+  width:52px!important;
+  height:52px!important;
+  min-width:52px!important;
+  min-height:52px!important;
+  border-radius:11px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  margin:0!important;
+  padding:0!important;
+  background:
+    linear-gradient(145deg,#f3ead5,#c9b88f)!important;
+  border:3px solid #655431!important;
+  color:#121212!important;
+  font-size:31px!important;
+  line-height:1!important;
+  text-shadow:none!important;
+  box-shadow:
+    inset -7px -7px 12px rgba(80,55,20,.24),
+    inset 5px 5px 10px rgba(255,255,255,.5),
+    0 6px 13px #0009!important;
+  transform-style:preserve-3d;
+}
+.diceGlow{
+  position:absolute;
+  width:68px;
+  height:22px;
+  bottom:0;
+  border-radius:50%;
+  background:radial-gradient(ellipse,rgba(43,132,255,.38),transparent 70%);
+  filter:blur(4px);
+  animation:diceGlowPulse 1.9s ease-in-out infinite;
+}
+@keyframes diceGlowPulse{
+  0%,100%{opacity:.45;transform:scale(.9)}
+  50%{opacity:.9;transform:scale(1.1)}
+}
+.diceTumbling{
+  animation:diceTumble3D .44s linear infinite!important;
+}
+@keyframes diceTumble3D{
+  0%{transform:rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateY(0)}
+  25%{transform:rotateX(90deg) rotateY(55deg) rotateZ(40deg) translateY(-5px)}
+  50%{transform:rotateX(180deg) rotateY(130deg) rotateZ(90deg) translateY(0)}
+  75%{transform:rotateX(270deg) rotateY(220deg) rotateZ(150deg) translateY(-4px)}
+  100%{transform:rotateX(360deg) rotateY(360deg) rotateZ(220deg) translateY(0)}
+}
+.diceLanding{
+  animation:diceBoardLand .5s cubic-bezier(.2,.8,.2,1)!important;
+}
+@keyframes diceBoardLand{
+  0%{transform:translateY(-8px) scale(.86) rotate(-8deg)}
+  55%{transform:translateY(2px) scale(1.12) rotate(4deg)}
+  78%{transform:translateY(-1px) scale(.98) rotate(-1deg)}
+  100%{transform:none}
+}
+
+/* Remove old sidebar die styling footprint completely */
+.actionHub #dice{display:none!important}
+
+/* Keep board compact */
+@media(max-width:950px){
+  .boardDiceArena{
+    padding:6px 8px;
+  }
+  .boardDiceHeader small{display:none}
+  .boardDiceWell{
+    width:62px;
+    flex-basis:62px;
+  }
+  .boardDie{
+    width:46px!important;
+    height:46px!important;
+    min-width:46px!important;
+    min-height:46px!important;
+    font-size:27px!important;
+  }
+}
+
+
+.cinematicDiceArena{display:grid!important;grid-template-columns:minmax(170px,1fr) 190px minmax(120px,.65fr);align-items:center;gap:18px!important;min-height:138px;padding:12px 20px!important;margin:0 0 9px!important;position:relative;overflow:hidden;background:radial-gradient(circle at 53% 52%,rgba(217,155,45,.17),transparent 22%),radial-gradient(circle at 54% 52%,rgba(45,124,227,.10),transparent 38%),linear-gradient(180deg,#0e141a,#080c11)!important;border:1px solid #655232!important}
+.boardDiceIntro{display:flex;flex-direction:column}.boardDiceTitle{font-family:Georgia,'Times New Roman',serif;font-size:17px;font-weight:900;letter-spacing:1.8px;color:#e7cc8c}.boardDiceIntro small{max-width:210px;margin-top:7px;font-size:8px;line-height:1.45;color:#9d9584}
+.cinematicDiceArena .boardDiceWell{width:190px!important;height:116px!important;perspective:760px;position:relative}
+.cinematicDiceArena .boardDie{width:86px!important;height:86px!important;min-width:86px!important;min-height:86px!important;border-radius:22px!important;font-size:57px!important;border:2px solid #75613a!important;background:radial-gradient(circle at 28% 22%,rgba(255,255,255,.65),transparent 18%),linear-gradient(145deg,#efe6d0 0%,#cdbc95 52%,#9d8964 100%)!important;color:#17130c!important;box-shadow:inset -13px -15px 19px rgba(54,37,13,.32),inset 9px 8px 13px rgba(255,255,255,.28),0 15px 25px rgba(0,0,0,.58)!important;transform-style:preserve-3d;backface-visibility:hidden}
+.cinematicDiceArena .diceGlow{width:130px!important;height:35px!important;bottom:4px!important;background:radial-gradient(ellipse,rgba(236,167,50,.43),rgba(77,119,190,.15) 45%,transparent 72%)!important;filter:blur(6px)!important}
+.diceOrbit{position:absolute;width:160px;height:78px;border-radius:50%;border:1px solid rgba(223,163,57,.17);transform:rotate(-10deg);animation:diceOrbitIdle 5s linear infinite}
+@keyframes diceOrbitIdle{0%{transform:rotate(-10deg)}100%{transform:rotate(350deg)}}
+.diceTumbling{animation:diceFluidTumble .53s cubic-bezier(.36,.08,.58,.96) infinite!important}
+@keyframes diceFluidTumble{0%{transform:translate3d(0,3px,0) rotateX(8deg) rotateY(-12deg) rotateZ(-3deg) scale(.96)}22%{transform:translate3d(-7px,-11px,18px) rotateX(87deg) rotateY(54deg) rotateZ(31deg) scale(1.02)}48%{transform:translate3d(7px,-16px,28px) rotateX(171deg) rotateY(139deg) rotateZ(83deg) scale(1.07)}73%{transform:translate3d(5px,-8px,14px) rotateX(267deg) rotateY(224deg) rotateZ(139deg) scale(1.01)}100%{transform:translate3d(0,3px,0) rotateX(368deg) rotateY(356deg) rotateZ(217deg) scale(.96)}}
+.diceLanding{animation:diceSoftLand .6s cubic-bezier(.16,.78,.29,1)!important}
+@keyframes diceSoftLand{0%{transform:translateY(-18px) rotateX(18deg) rotateZ(-7deg) scale(.88)}48%{transform:translateY(3px) rotateX(-5deg) rotateZ(3deg) scale(1.07)}72%{transform:translateY(-2px) rotateZ(-1deg) scale(.985)}100%{transform:none}}
+.rollResultPanel{padding-left:18px;border-left:1px solid rgba(190,151,73,.28);display:flex;flex-direction:column;justify-content:center;min-height:90px}
+.rollResultLabel{font-family:Georgia,'Times New Roman',serif;color:#cdb27a;font-size:9px;font-weight:900;letter-spacing:1.8px}
+#rollValue{margin-top:1px;font-family:Georgia,'Times New Roman',serif;font-size:48px;line-height:.95;color:#f5dda0;text-shadow:0 2px 0 #4f3917,0 0 15px rgba(229,174,70,.34)}
+#rollDetail{min-height:12px;margin-top:7px;color:#9b9280;font-size:7px;line-height:1.25}
+.rollValuePop{animation:rollValuePopAnim .62s cubic-bezier(.2,.8,.2,1)}
+@keyframes rollValuePopAnim{0%{opacity:.15;transform:translateY(7px) scale(.72)}62%{opacity:1;transform:translateY(-1px) scale(1.12)}100%{transform:none}}
+.cinematicDiceArena .boardDie:not(.diceTumbling):not(.diceLanding){animation:none!important}
+
+
+/* ==========================================================
+   REALISTIC 3D DICE v4.3.4
+   ========================================================== */
+.realisticDieScene{
+  width:104px!important;
+  height:104px!important;
+  min-width:104px!important;
+  min-height:104px!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+  perspective:560px!important;
+  overflow:visible!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+.dieCube{
+  --dieSize:78px;
+  --half:39px;
+  position:relative;
+  width:var(--dieSize);
+  height:var(--dieSize);
+  transform-style:preserve-3d;
+  transition:transform .58s cubic-bezier(.18,.72,.24,1);
+  filter:drop-shadow(0 14px 12px rgba(0,0,0,.54));
+}
+.dieFace{
+  position:absolute;
+  inset:0;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  grid-template-rows:repeat(3,1fr);
+  padding:12px;
+  border-radius:15px;
+  box-sizing:border-box;
+  border:1px solid rgba(104,83,47,.7);
+  background:
+    radial-gradient(circle at 27% 20%,rgba(255,255,255,.9),transparent 20%),
+    linear-gradient(145deg,#f8f1df 0%,#e2d4b6 50%,#bba77f 100%);
+  box-shadow:
+    inset 7px 7px 10px rgba(255,255,255,.35),
+    inset -9px -10px 14px rgba(74,54,24,.20);
+  backface-visibility:hidden;
+}
+.dieFace::after{
+  content:"";
+  position:absolute;
+  inset:3px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.22);
+  pointer-events:none;
+}
+.dieFace1{transform:rotateY(0deg) translateZ(var(--half))}
+.dieFace2{transform:rotateY(90deg) translateZ(var(--half))}
+.dieFace3{transform:rotateY(180deg) translateZ(var(--half))}
+.dieFace4{transform:rotateY(-90deg) translateZ(var(--half))}
+.dieFace5{transform:rotateX(90deg) translateZ(var(--half))}
+.dieFace6{transform:rotateX(-90deg) translateZ(var(--half))}
+
+.pip{
+  width:13px;
+  height:13px;
+  align-self:center;
+  justify-self:center;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 35% 28%,#464038 0 10%,#191714 36%,#050505 72%);
+  box-shadow:
+    inset 2px 2px 3px rgba(0,0,0,.75),
+    inset -1px -1px 2px rgba(255,255,255,.11),
+    0 1px 1px rgba(255,255,255,.16);
+}
+.p1{grid-column:1;grid-row:1}
+.p3{grid-column:3;grid-row:1}
+.p4{grid-column:1;grid-row:2}
+.p5{grid-column:2;grid-row:2}
+.p6{grid-column:3;grid-row:2}
+.p7{grid-column:1;grid-row:3}
+.p9{grid-column:3;grid-row:3}
+
+/* Resting orientations for each result. */
+.dieCube.face1{transform:rotateX(-10deg) rotateY(10deg)}
+.dieCube.face2{transform:rotateX(-8deg) rotateY(-80deg)}
+.dieCube.face3{transform:rotateX(-8deg) rotateY(-170deg)}
+.dieCube.face4{transform:rotateX(-8deg) rotateY(100deg)}
+.dieCube.face5{transform:rotateX(-100deg) rotateY(4deg)}
+.dieCube.face6{transform:rotateX(80deg) rotateY(-4deg)}
+
+/* Realistic tumble: varying axes and height instead of rigid quarter-turns. */
+.dieCube.rolling3d{
+  animation:realDieTumble .72s cubic-bezier(.31,.03,.64,.98)!important;
+}
+@keyframes realDieTumble{
+  0%{
+    transform:translate3d(0,4px,0) rotateX(-12deg) rotateY(10deg) rotateZ(0deg) scale(.96)
+  }
+  18%{
+    transform:translate3d(-9px,-12px,24px) rotateX(71deg) rotateY(48deg) rotateZ(24deg) scale(1.03)
+  }
+  39%{
+    transform:translate3d(8px,-22px,40px) rotateX(158deg) rotateY(137deg) rotateZ(67deg) scale(1.09)
+  }
+  61%{
+    transform:translate3d(12px,-13px,25px) rotateX(244deg) rotateY(219deg) rotateZ(121deg) scale(1.04)
+  }
+  81%{
+    transform:translate3d(-4px,-5px,10px) rotateX(326deg) rotateY(301deg) rotateZ(179deg) scale(.99)
+  }
+  100%{
+    transform:translate3d(0,3px,0) rotateX(407deg) rotateY(391deg) rotateZ(229deg) scale(.97)
+  }
+}
+
+/* Ground contact adds realism. */
+.cinematicDiceArena .diceGlow{
+  width:145px!important;
+  height:32px!important;
+  bottom:2px!important;
+  opacity:.72;
+  background:
+    radial-gradient(ellipse,rgba(229,163,49,.34),rgba(43,80,121,.11) 44%,transparent 72%)!important;
+  filter:blur(7px)!important;
+}
+.dieCube:not(.rolling3d){
+  animation:dieIdleFloat 3.2s ease-in-out infinite;
+}
+@keyframes dieIdleFloat{
+  0%,100%{translate:0 0}
+  50%{translate:0 -2px}
+}
+
+@media(max-width:1100px){
+  .realisticDieScene{
+    width:86px!important;
+    height:86px!important;
+    min-width:86px!important;
+    min-height:86px!important;
+  }
+  .dieCube{
+    --dieSize:64px;
+    --half:32px;
+  }
+  .dieFace{padding:10px;border-radius:12px}
+  .pip{width:10px;height:10px}
+}
+
+
+/* ==========================================================
+   VISIBLE REALISTIC DIE v4.3.5
+   Always-visible face, realistic shading, no hidden cube sides.
+   ========================================================== */
+.realisticDieScene{
+  width:116px!important;
+  height:116px!important;
+  min-width:116px!important;
+  min-height:116px!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+  perspective:700px!important;
+  overflow:visible!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+.visibleDieFace{
+  position:relative;
+  width:84px;
+  height:84px;
+  border-radius:20px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  grid-template-rows:repeat(3,1fr);
+  padding:14px;
+  box-sizing:border-box;
+  background:
+    radial-gradient(circle at 24% 18%,rgba(255,255,255,.95),transparent 21%),
+    linear-gradient(145deg,#f8f2e2 0%,#e4d7bb 48%,#b9a47d 100%);
+  border:2px solid #735f39;
+  box-shadow:
+    inset 8px 8px 11px rgba(255,255,255,.38),
+    inset -11px -12px 16px rgba(73,52,22,.25),
+    0 15px 23px rgba(0,0,0,.52),
+    0 0 0 1px rgba(230,196,119,.16);
+  transform:rotateX(10deg) rotateY(-12deg) rotateZ(-3deg);
+  transform-style:preserve-3d;
+  will-change:transform;
+}
+.visibleDieFace::before{
+  content:"";
+  position:absolute;
+  inset:4px;
+  border-radius:15px;
+  border:1px solid rgba(255,255,255,.32);
+  pointer-events:none;
+}
+.visibleDieFace::after{
+  content:"";
+  position:absolute;
+  left:12%;
+  right:12%;
+  bottom:-17px;
+  height:14px;
+  background:radial-gradient(ellipse,rgba(0,0,0,.45),transparent 70%);
+  filter:blur(4px);
+  transform:rotateX(70deg);
+  pointer-events:none;
+}
+.visibleDieFace .pip{
+  display:none;
+  width:14px;
+  height:14px;
+  align-self:center;
+  justify-self:center;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 38% 32%,#514a40 0 10%,#1f1c18 35%,#080706 72%);
+  box-shadow:
+    inset 2px 2px 4px rgba(0,0,0,.82),
+    inset -1px -1px 2px rgba(255,255,255,.09),
+    0 1px 1px rgba(255,255,255,.14);
+}
+.visibleDieFace .p1{grid-column:1;grid-row:1}
+.visibleDieFace .p2{grid-column:2;grid-row:1}
+.visibleDieFace .p3{grid-column:3;grid-row:1}
+.visibleDieFace .p4{grid-column:1;grid-row:2}
+.visibleDieFace .p5{grid-column:2;grid-row:2}
+.visibleDieFace .p6{grid-column:3;grid-row:2}
+.visibleDieFace .p7{grid-column:1;grid-row:3}
+.visibleDieFace .p8{grid-column:2;grid-row:3}
+.visibleDieFace .p9{grid-column:3;grid-row:3}
+
+/* Face layouts */
+.visibleDieFace.face1 .p5{display:block}
+.visibleDieFace.face2 .p1,
+.visibleDieFace.face2 .p9{display:block}
+.visibleDieFace.face3 .p1,
+.visibleDieFace.face3 .p5,
+.visibleDieFace.face3 .p9{display:block}
+.visibleDieFace.face4 .p1,
+.visibleDieFace.face4 .p3,
+.visibleDieFace.face4 .p7,
+.visibleDieFace.face4 .p9{display:block}
+.visibleDieFace.face5 .p1,
+.visibleDieFace.face5 .p3,
+.visibleDieFace.face5 .p5,
+.visibleDieFace.face5 .p7,
+.visibleDieFace.face5 .p9{display:block}
+.visibleDieFace.face6 .p1,
+.visibleDieFace.face6 .p3,
+.visibleDieFace.face6 .p4,
+.visibleDieFace.face6 .p6,
+.visibleDieFace.face6 .p7,
+.visibleDieFace.face6 .p9{display:block}
+
+/* Smooth wobbling roll while keeping the face plane visible. */
+.rollingVisibleDie{
+  animation:visibleDieRoll .55s cubic-bezier(.36,.08,.58,.96) infinite!important;
+}
+@keyframes visibleDieRoll{
+  0%{transform:translate3d(0,2px,0) rotateX(10deg) rotateY(-12deg) rotateZ(-3deg) scale(.96)}
+  20%{transform:translate3d(-7px,-12px,20px) rotateX(32deg) rotateY(-28deg) rotateZ(18deg) scale(1.03)}
+  43%{transform:translate3d(8px,-18px,28px) rotateX(-18deg) rotateY(34deg) rotateZ(48deg) scale(1.08)}
+  66%{transform:translate3d(7px,-9px,15px) rotateX(26deg) rotateY(18deg) rotateZ(76deg) scale(1.02)}
+  84%{transform:translate3d(-3px,-4px,7px) rotateX(-8deg) rotateY(-22deg) rotateZ(101deg) scale(.99)}
+  100%{transform:translate3d(0,2px,0) rotateX(10deg) rotateY(-12deg) rotateZ(118deg) scale(.96)}
+}
+.landingVisibleDie{
+  animation:visibleDieLand .52s cubic-bezier(.16,.78,.29,1)!important;
+}
+@keyframes visibleDieLand{
+  0%{transform:translateY(-15px) rotateX(18deg) rotateY(-18deg) rotateZ(-7deg) scale(.9)}
+  48%{transform:translateY(3px) rotateX(7deg) rotateY(-10deg) rotateZ(3deg) scale(1.06)}
+  72%{transform:translateY(-2px) rotateX(11deg) rotateY(-13deg) rotateZ(-1deg) scale(.99)}
+  100%{transform:rotateX(10deg) rotateY(-12deg) rotateZ(-3deg) scale(1)}
+}
+
+.cinematicDiceArena .diceOrbit{
+  width:174px!important;
+  height:86px!important;
+}
+.cinematicDiceArena .diceGlow{
+  width:148px!important;
+  height:34px!important;
+  bottom:0!important;
+}
+
+
+/* ==========================================================
+   FULL-FACE DICE FIX v4.3.6
+   ========================================================== */
+.cinematicDiceArena .boardDiceWell{
+  overflow:visible!important;
+  isolation:isolate;
+  min-width:190px!important;
+}
+.realisticDieScene{
+  position:relative!important;
+  z-index:10!important;
+  overflow:visible!important;
+  perspective:none!important;
+}
+.visibleDieFace{
+  position:relative!important;
+  z-index:20!important;
+  width:88px!important;
+  height:88px!important;
+  transform:rotateZ(-3deg)!important;
+  transform-origin:center center!important;
+  overflow:visible!important;
+  backface-visibility:visible!important;
+}
+.visibleDieFace::before{
+  z-index:0!important;
+}
+.visibleDieFace .pip{
+  position:relative;
+  z-index:2!important;
+}
+.cinematicDiceArena .diceOrbit{
+  z-index:1!important;
+  pointer-events:none!important;
+}
+.cinematicDiceArena .diceGlow{
+  z-index:0!important;
+  pointer-events:none!important;
+}
+
+/* Keep the roll lively without tipping the face away from the viewer. */
+.rollingVisibleDie{
+  animation:visibleDieRollFlat .55s cubic-bezier(.36,.08,.58,.96) infinite!important;
+}
+@keyframes visibleDieRollFlat{
+  0%{transform:translate3d(0,2px,0) rotateZ(-3deg) scale(.96)}
+  20%{transform:translate3d(-7px,-12px,0) rotateZ(24deg) scale(1.03)}
+  43%{transform:translate3d(8px,-18px,0) rotateZ(68deg) scale(1.08)}
+  66%{transform:translate3d(7px,-9px,0) rotateZ(112deg) scale(1.02)}
+  84%{transform:translate3d(-3px,-4px,0) rotateZ(156deg) scale(.99)}
+  100%{transform:translate3d(0,2px,0) rotateZ(177deg) scale(.96)}
+}
+.landingVisibleDie{
+  animation:visibleDieLandFlat .52s cubic-bezier(.16,.78,.29,1)!important;
+}
+@keyframes visibleDieLandFlat{
+  0%{transform:translateY(-15px) rotateZ(-11deg) scale(.9)}
+  48%{transform:translateY(3px) rotateZ(4deg) scale(1.06)}
+  72%{transform:translateY(-2px) rotateZ(-1deg) scale(.99)}
+  100%{transform:rotateZ(-3deg) scale(1)}
+}
+
 </style>
 </head>
 <body>
@@ -1261,7 +1977,7 @@ button:hover:not(:disabled){filter:brightness(1.12)}
       </div>
       <div id="multiplayerStatus">Connecting to Firebase...</div>
     </div>
-    <div class="small" style="margin-top:18px">Region Artwork v4.3.0 · Collection progress saves in this browser</div>
+    <div class="small" style="margin-top:18px">Full-Face Dice Fix v4.3.6 · Collection progress saves in this browser</div>
   </div>
 </div>
 
@@ -1280,18 +1996,50 @@ button:hover:not(:disabled){filter:brightness(1.12)}
 <h1 class="mqLogo">MONSTER <span>QUEST</span></h1>
 <div class="sub mqTagline">A DARK FANTASY BOARD ADVENTURE · SURVIVE FOUR REGIONS · DEFEAT THE ANCIENT DRAGON</div>
 <div class="grid">
-<main class="panel boardPanel"><h2>🗺️ THE SHARED WORLD</h2><div id="world"></div></main>
+<main class="panel boardPanel"><h2>🗺️ THE SHARED WORLD</h2>
+<div class="boardDiceArena cinematicDiceArena">
+  <div class="boardDiceIntro">
+    <span class="boardDiceTitle">ROLL OF FATE</span>
+    <small>Roll the die to move, battle monsters and challenge the gate.</small>
+  </div>
+  <div class="boardDiceWell">
+    <div class="diceOrbit"></div>
+    <div id="dice" class="dice boardDie realisticDieScene" aria-label="Dice">
+      <div id="dieFaceVisible" class="visibleDieFace face1">
+        <span class="pip p1"></span>
+        <span class="pip p2"></span>
+        <span class="pip p3"></span>
+        <span class="pip p4"></span>
+        <span class="pip p5"></span>
+        <span class="pip p6"></span>
+        <span class="pip p7"></span>
+        <span class="pip p8"></span>
+        <span class="pip p9"></span>
+      </div>
+    </div>
+    <div class="diceGlow"></div>
+  </div>
+  <div class="rollResultPanel">
+    <span class="rollResultLabel">ROLLED</span>
+    <strong id="rollValue">—</strong>
+    <small id="rollDetail">Awaiting roll</small>
+  </div>
+</div><div id="world"></div></main>
 <aside class="panel controlPanel">
 <div id="roomBadge"></div>
 <div id="turnBanner" class="turnBanner" style="display:none"></div>
 <div id="multiplayerPlayers" class="multiplayerPlayers" style="display:none"></div>
 <div id="players" class="players"></div>
-<div class="stats">
-<div class="stat">❤️ HP<b id="hp"></b></div><div class="stat">⚔️ Attack<b id="atk"></b></div><div class="stat">🃏 Cards<b id="cards"></b></div>
+<div class="soloStatusBlock">
+  <div class="stats">
+    <div class="stat">❤️ HP<b id="hp"></b></div><div class="stat">⚔️ Attack<b id="atk"></b></div><div class="stat">🃏 Cards<b id="cards"></b></div>
+  </div>
+  <p id="quickInfo">Region <b id="region"></b> · Space <b id="pos"></b><br>🧪 <b id="potions"></b> · 🗝️ <b id="key"></b> · 🗿 <b id="tempAtk"></b></p>
+  <div id="equipment" class="box"></div>
 </div>
-<p id="quickInfo">Region <b id="region"></b> · Space <b id="pos"></b><br>🧪 <b id="potions"></b> · 🗝️ <b id="key"></b> · 🗿 <b id="tempAtk"></b></p><div id="equipment" class="box"></div>
-<div class="dice" id="dice">🎲</div>
-<div class="buttons">
+<div class="actionHub">
+  <div class="actionHubTop"><span class="actionHubTitle">CURRENT ACTION</span></div>
+  <div class="buttons actionButtons">
 <button id="roll">🎲 Roll to Move</button>
 <button id="fight" class="danger" disabled>⚔️ Fight</button>
 <button id="pass" class="secondary" disabled>Pass</button>
@@ -1299,8 +2047,9 @@ button:hover:not(:disabled){filter:brightness(1.12)}
 <button id="potion" class="secondary" disabled>🧪 Use Potion</button>
 <button id="end" class="secondary" disabled>➡️ End Turn</button>
 <button id="new" class="secondary">New Game</button><button id="menu" class="secondary">Main Menu</button>
+  </div>
 </div>
-<div id="msg" class="box"></div>
+<div id="msg" class="box streamlinedMsg"></div>
 <div id="monsterCardTemplate" style="
   display: none;
   width: 100%;
@@ -1891,7 +2640,7 @@ function rollFinalRoad(){
  const base=d6();
  const bonus=movementBonus(p);
  const n=base+bonus;
- $("dice").textContent=bonus?`🎲 ${base} + 💍1 = ${n}`:`🎲 ${n}`;
+ animateDiceResult(bonus?`🎲 ${base} + 💍1 = ${n}`:`🎲 ${n}`);
  $("roll").disabled=true;
  p.finalRoadPos+=n;
  syncMyMultiplayerState();
@@ -2045,18 +2794,52 @@ function pulseElement(el,className,duration=650){
  el.classList.add(className);
  setTimeout(()=>el.classList.remove(className),duration);
 }
+function setRealisticDieFace(value){
+ const face=$("dieFaceVisible");
+ if(!face)return;
+ const v=Math.max(1,Math.min(6,parseInt(value,10)||1));
+ face.className=`visibleDieFace face${v}`;
+ face.dataset.value=String(v);
+}
+
 function animateDiceResult(text){
- const die=$("dice");
- if(!die)return;
- die.classList.remove("diceRolling","diceLanding");
- void die.offsetWidth;
- die.classList.add("diceRolling");
- setTimeout(()=>{
-   die.textContent=text;
-   die.classList.remove("diceRolling");
-   die.classList.add("diceLanding");
-   setTimeout(()=>die.classList.remove("diceLanding"),420);
- },420);
+ const face=$("dieFaceVisible");
+ const valueEl=$("rollValue");
+ const detailEl=$("rollDetail");
+ if(!face)return;
+
+ const numbers=String(text).match(/\d+/g)||[];
+ const finalValue=numbers.length?numbers[numbers.length-1]:"1";
+ const faceValue=Math.max(1,Math.min(6,parseInt(finalValue,10)||1));
+
+ if(valueEl)valueEl.textContent="…";
+ if(detailEl)detailEl.textContent="Rolling...";
+
+ face.classList.remove("rollingVisibleDie","landingVisibleDie");
+ void face.offsetWidth;
+ face.classList.add("rollingVisibleDie");
+
+ let ticks=0;
+ const timer=setInterval(()=>{
+   const randomFace=1+Math.floor(Math.random()*6);
+   face.className=`visibleDieFace face${randomFace} rollingVisibleDie`;
+   ticks++;
+   if(ticks>=10){
+     clearInterval(timer);
+     face.className=`visibleDieFace face${faceValue} landingVisibleDie`;
+
+     if(valueEl)valueEl.textContent=finalValue;
+     if(detailEl){
+       const clean=String(text).replace(/^🎲\s*/,"");
+       detailEl.textContent=clean===String(finalValue)?"Final result":clean;
+     }
+
+     pulseElement(valueEl,"rollValuePop",620);
+     setTimeout(()=>{
+       face.classList.remove("landingVisibleDie");
+     },520);
+   }
+ },55);
 }
 function flashPlayerChange(index,type){
  const cards=document.querySelectorAll(".playerHud");
@@ -2659,7 +3442,7 @@ function rollRoad(){
  let n=base+bonus;
  if(p.roadSlow){n=Math.max(1,n-p.roadSlow);p.roadSlow=0}
  if(p.roadCap){n=Math.min(n,p.roadCap);p.roadCap=0}
- $("dice").textContent=bonus?`🎲 ${base} + 💍1 = ${n}`:`🎲 ${n}`;
+ animateDiceResult(bonus?`🎲 ${base} + 💍1 = ${n}`:`🎲 ${n}`);
  $("roll").disabled=true;
  p.roadPos+=n;
  if(p.roadPos>=7){
@@ -3052,7 +3835,8 @@ function multiplayerTurnSnapshot(){
    encounter:G.encounter||null,
    boss:G.boss||null,
    winner:G.winner||null,
-   diceText:$("dice")?$("dice").textContent:"🎲",
+   diceValue:$("rollValue")?$("rollValue").textContent:"—",
+   diceDetail:$("rollDetail")?$("rollDetail").textContent:"Awaiting roll",
    message:$("msg")?$("msg").innerHTML:"",
    cardVisible:!!(G.encounter && G.encounter.cardData)
  }));
@@ -3073,6 +3857,7 @@ function syncMultiplayerAll(){
  );
 }
 function renderMultiplayerPlayerCards(){
+ document.body.classList.toggle("multiplayerMode",!!(G&&G.multiplayer));
  const wrap=$("multiplayerPlayers");
  if(!wrap)return;
  if(!G || !G.multiplayer || G.players.length<2){
@@ -3218,7 +4003,7 @@ function restoreMultiplayerTurnForActivePlayer(){
 
  hideMonsterCard();
  hide("boss");
- $("dice").textContent="🎲";
+ setRealisticDieFace(1); if($("rollValue"))$("rollValue").textContent="—"; if($("rollDetail"))$("rollDetail").textContent="Awaiting roll";
 
  if(phase==="atGate"){
    p.locationMode="gate";
@@ -3283,7 +4068,12 @@ function applyRemoteRoomState(room){
    G.boss=room.turnState.boss||null;
    G.winner=room.turnState.winner||null;
 
-   if($("dice") && room.turnState.diceText)$("dice").textContent=room.turnState.diceText;
+   if(room.turnState.diceValue && room.turnState.diceValue!=="—"){
+     const dv=parseInt(room.turnState.diceValue,10);
+     if(Number.isFinite(dv))setRealisticDieFace(dv);
+     if($("rollValue"))$("rollValue").textContent=room.turnState.diceValue;
+   }
+   if($("rollDetail") && room.turnState.diceDetail!==undefined)$("rollDetail").textContent=room.turnState.diceDetail;
    if($("msg") && room.turnState.message!==undefined)$("msg").innerHTML=room.turnState.message;
 
    if(G.phase==="encounter" && G.encounter && G.encounter.cardData){
@@ -5089,7 +5879,7 @@ window.MQFirebase={
     activePlayer:0,
     world,
     players,
-    turnState:{phase:"move",encounter:null,boss:null,winner:null,diceText:"🎲",message:"🎲 Player 1 starts.",cardVisible:false}
+    turnState:{phase:"move",encounter:null,boss:null,winner:null,diceValue:"—",diceDetail:"Awaiting roll",message:"🎲 Player 1 starts.",cardVisible:false}
   });
 
   window.MQMultiplayerBridge.setHostRoom(code,players,0);
@@ -5146,7 +5936,8 @@ window.MQFirebase={
       encounter:null,
       boss:null,
       winner:null,
-      diceText:"🎲",
+      diceValue:"—",
+      diceDetail:"Awaiting roll",
       message:`Player ${index===0?2:1}'s turn.`,
       cardVisible:false
     }
@@ -5166,7 +5957,7 @@ window.MQFirebase={
 
 try{
  await ensureSignedIn();
- window.MQMultiplayerBridge.setStatus("Firebase connected. Region Artwork v4.3.0 ready.");
+ window.MQMultiplayerBridge.setStatus("Firebase connected. Full-Face Dice Fix v4.3.6 ready.");
 }catch(err){
  console.error(err);
  window.MQMultiplayerBridge.setStatus(`Firebase connection failed: ${err.message}`,true);
