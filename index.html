@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Monster Quest v4.3.6</title>
+<title>Monster Quest v4.6.1</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#09111f;color:#f8fafc;font-family:system-ui,sans-serif}.wrap{max-width:1400px;margin:auto;padding:20px}
 .grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px}.panel{background:#162033;border:1px solid #334155;border-radius:16px;padding:16px}
@@ -1954,6 +1954,196 @@ button:hover:not(:disabled){filter:brightness(1.12)}
   100%{transform:rotateZ(-3deg) scale(1)}
 }
 
+
+/* STAGE 4A — MONSTER BATTLE SCREEN */
+.battleOverlay{position:fixed;inset:0;z-index:5000;display:none;align-items:center;justify-content:center;padding:16px}.battleOverlay.open{display:flex}.battleBackdrop{position:absolute;inset:0;background:rgba(2,5,8,.86);backdrop-filter:blur(5px) brightness(.55)}.battleFrame{position:relative;z-index:2;width:min(1020px,96vw);max-height:94vh;overflow:auto;padding:12px;border:2px solid #a9853e;border-radius:14px;background:linear-gradient(180deg,#1b1f24,#090c10);box-shadow:0 0 0 2px #171108,0 30px 90px #000d,inset 0 0 45px #0009;animation:battleFrameIn .38s ease-out}@keyframes battleFrameIn{from{opacity:0;transform:translateY(15px) scale(.96)}to{opacity:1;transform:none}}.battleTopBar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:4px 8px 9px;border-bottom:1px solid #4c4029}.battleEyebrow{font:900 18px Georgia,serif;letter-spacing:2px;color:#efd395}.battleRegion{margin-top:3px;font-size:8px;letter-spacing:1.4px;color:#9e9277}.battleSpectatorBadge{padding:5px 8px;border:1px solid #665532;border-radius:999px;background:#15130f;color:#d7bd7b;font-size:8px;font-weight:900}.battleArena{display:grid;grid-template-columns:minmax(190px,1fr) minmax(270px,1.15fr) minmax(220px,1fr);gap:12px;padding:12px 0 8px}.battleCombatant,.battleCenter{border:1px solid #3b403f;border-radius:10px;background:linear-gradient(180deg,#131a21,#090e13);box-shadow:inset 0 0 18px #0008}.battleCombatant{display:flex;flex-direction:column;align-items:center;padding:10px}.battleSideTitle{width:100%;text-align:center;padding-bottom:5px;border-bottom:1px solid #34373a;font:900 8px Georgia,serif;letter-spacing:1.5px;color:#a99b7c}.battleHeroPawn{margin:18px 0 7px;width:78px;height:78px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:50px;background:radial-gradient(circle at 35% 25%,#4a96e8,#173b70 70%);border:3px solid #d8c99e;box-shadow:0 0 20px #438fdc40,inset 0 0 18px #0007}.battleHeroPawn.red{background:radial-gradient(circle at 35% 25%,#e7685d,#781c1a 70%)}.battleName{font:900 13px Georgia,serif;color:#efe2be}.battleHpBlock{width:100%;margin-top:11px;text-align:center}.battleStatLabel{font-size:7px;color:#978d79;letter-spacing:1px}.battleHpTrack{height:8px;margin:4px 0;overflow:hidden;border-radius:999px;background:#240b0d;border:1px solid #592828}.battleHpTrack span{display:block;height:100%;background:linear-gradient(90deg,#7d1f1d,#d94334,#ed765c);transition:width .3s ease}.battleMiniStats{width:100%;display:grid;gap:5px;margin-top:10px}.battleMiniStats>div{padding:6px;border:1px solid #343c44;border-radius:6px;background:#0c1218}.battleMiniStats span{display:block;color:#8d96a0;font-size:7px}.battleMiniStats b{display:block;margin-top:2px;color:#eed69d;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.battleMonsterArt{width:100%;aspect-ratio:4/3;margin:9px 0 7px;overflow:hidden;border:2px solid #7e6738;border-radius:8px;background:#0d1217;box-shadow:0 7px 20px #0008}.battleMonsterArt img{width:100%;height:100%;object-fit:cover}.battleMonsterName{text-align:center;font:900 16px Georgia,serif;color:#f0e2bd}.battleRarity{margin-top:4px;padding:3px 7px;border-radius:999px;border:1px solid #4a5360;background:#202a34;color:#cbd5df;font-size:7px;font-weight:900}.battleCenter{position:relative;display:flex;flex-direction:column;align-items:center;padding:10px}.battleVs{font:900 21px Georgia,serif;color:#8e7440}.battleRequirement{text-align:center}.battleRequirement span,.battleRollReadout span{display:block;font-size:7px;letter-spacing:1.3px;color:#958a75}.battleRequirement strong{display:block;font:900 31px Georgia,serif;line-height:1;color:#f0d18a}.battleRequirement small{display:block;min-height:11px;margin-top:3px;color:#8b8170;font-size:7px}.battleDiceStage{position:relative;width:125px;height:105px;margin-top:4px;display:flex;align-items:center;justify-content:center}.battleDie{position:relative;z-index:2;width:76px;height:76px;padding:12px;border-radius:18px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);background:radial-gradient(circle at 24% 18%,#fff,transparent 20%),linear-gradient(145deg,#f7efdd,#dfd0af 48%,#aa956d);border:2px solid #755e34;box-shadow:inset 7px 7px 10px #ffffff55,inset -10px -11px 15px #49341644,0 12px 19px #0009}.battlePip{display:none;width:12px;height:12px;align-self:center;justify-self:center;border-radius:50%;background:radial-gradient(circle at 35% 28%,#48433b 0 9%,#181614 36%,#040404 72%);box-shadow:inset 2px 2px 3px #000c}.battlePip.p1{grid-column:1;grid-row:1}.battlePip.p2{grid-column:2;grid-row:1}.battlePip.p3{grid-column:3;grid-row:1}.battlePip.p4{grid-column:1;grid-row:2}.battlePip.p5{grid-column:2;grid-row:2}.battlePip.p6{grid-column:3;grid-row:2}.battlePip.p7{grid-column:1;grid-row:3}.battlePip.p8{grid-column:2;grid-row:3}.battlePip.p9{grid-column:3;grid-row:3}.battleDie.face1 .p5{display:block}.battleDie.face2 .p1,.battleDie.face2 .p9{display:block}.battleDie.face3 .p1,.battleDie.face3 .p5,.battleDie.face3 .p9{display:block}.battleDie.face4 .p1,.battleDie.face4 .p3,.battleDie.face4 .p7,.battleDie.face4 .p9{display:block}.battleDie.face5 .p1,.battleDie.face5 .p3,.battleDie.face5 .p5,.battleDie.face5 .p7,.battleDie.face5 .p9{display:block}.battleDie.face6 .p1,.battleDie.face6 .p3,.battleDie.face6 .p4,.battleDie.face6 .p6,.battleDie.face6 .p7,.battleDie.face6 .p9{display:block}.battleDie.rolling{animation:battleDieRoll .48s ease-in-out infinite}@keyframes battleDieRoll{0%{transform:translateY(2px) rotate(-4deg) scale(.96)}50%{transform:translate(7px,-15px) rotate(77deg) scale(1.08)}100%{transform:translateY(2px) rotate(176deg) scale(.96)}}.battleRollReadout{text-align:center}.battleRollReadout strong{display:block;font:900 34px Georgia,serif;line-height:1;color:#f4d994}.battleRollReadout small{display:block;min-height:11px;margin-top:3px;color:#918878;font-size:7px}.battleResult{width:100%;margin-top:6px;padding:7px;text-align:center;border:1px solid #4d4d45;border-radius:7px;background:#111617}.battleResult strong{display:block;font:900 18px Georgia,serif}.battleResult span{display:block;margin-top:2px;font-size:8px}.battleResult.win{border-color:#7f6c2d;background:#292313;color:#f4d780}.battleResult.loss{border-color:#7b2929;background:#341516;color:#f4a29d}.battleActions{width:100%;display:grid;grid-template-columns:1.3fr .7fr;gap:6px;margin-top:auto;padding-top:8px}.battleActions button{min-height:36px;font-size:10px}.battleFightBtn{background:linear-gradient(#8c2f2c,#491514)!important;border-color:#b64c45!important}.battleFooter{padding:7px 9px 2px;text-align:center;font-size:8px;color:#938b78;border-top:1px solid #393329}.battleOverlay.spectator .battleActions{display:none}.battleOverlay.spectator .battleCenter::after{content:"Watching the active player's battle";margin-top:auto;padding-top:8px;color:#a89a79;font-size:8px}@media(max-width:820px){.battleArena{grid-template-columns:1fr}.battleHeroPawn{margin:8px 0;width:56px;height:56px;font-size:35px}.battleFrame{max-height:98vh}}
+
+\n/* Stage 4A.2 — loot choice stays inside the victory screen */\n.battleLootActions{\n  grid-template-columns:1fr 1fr!important;\n  align-items:stretch;\n}\n.battleLootPanel{\n  grid-column:1 / -1;\n  padding:8px;\n  border:1px solid #756035;\n  border-radius:8px;\n  text-align:center;\n  background:linear-gradient(180deg,#251e11,#110e09);\n  box-shadow:inset 0 0 12px #0008;\n}\n.battleLootEyebrow{font-size:7px;letter-spacing:1.4px;color:#bda467;font-weight:900}\n.battleLootName{margin-top:3px;font:900 15px Georgia,serif;color:#f1d58d}\n.battleLootEffect{margin-top:3px;font-size:9px;color:#8fe0a6}\n.battleLootCompare{margin-top:7px;padding-top:6px;border-top:1px solid #453a25}\n.battleLootCompare span{display:block;font-size:6px;letter-spacing:1.3px;color:#8e8779}\n.battleLootCompare b{display:block;margin-top:2px;font-size:8px;color:#c8c0ad;white-space:normal}\n.battleEquipBtn{background:linear-gradient(#3f7d45,#1e4b27)!important;border-color:#68a66c!important}\n
+
+/* STAGE 4B — ANIMATED BOARD MOVEMENT */
+.movingPawnGhost{position:fixed;z-index:6500;width:22px;height:22px;margin-left:-11px;margin-top:-11px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff;border:2px solid #f7f1dc;box-shadow:0 3px 9px #000b,0 0 12px #fff3;pointer-events:none;transition-property:left,top,transform;transition-timing-function:cubic-bezier(.2,.72,.22,1)}
+.movingPawnGhost.p1{background:linear-gradient(#4a9cff,#1557b0)}.movingPawnGhost.p2{background:linear-gradient(#ff6c62,#a91e1e)}
+.movingPlayer1 .playerToken.p1{opacity:0!important}.movingPlayer2 .playerToken.p2{opacity:0!important}
+.movingPawnGhost.pawnHop{animation:pawnTravelHop .19s ease-in-out infinite alternate}@keyframes pawnTravelHop{from{transform:translateY(0) scale(1)}to{transform:translateY(-7px) scale(1.09)}}
+.movingPawnGhost.pawnArrive{animation:pawnArrivePop .16s ease-out forwards!important}@keyframes pawnArrivePop{0%{transform:scale(1)}60%{transform:scale(1.35)}100%{transform:scale(.9);opacity:0}}
+.landNormal{animation:landNormalFx .7s ease!important}.landMonster{animation:landMonsterFx .85s ease!important}.landTrap{animation:landTrapFx .65s ease!important}.landTreasure{animation:landTreasureFx .9s ease!important}.landHeal{animation:landHealFx .9s ease!important}.landShrine{animation:landShrineFx .9s ease!important}.landMystery{animation:landMysteryFx .9s ease!important}.landBoss{animation:landBossFx .9s ease!important}.roadLanding{animation:roadLandingFx .85s ease!important}.finalLanding{animation:finalLandingFx .9s ease!important}
+@keyframes landNormalFx{45%{filter:brightness(1.45);box-shadow:0 0 18px #f5dc9673}}
+@keyframes landMonsterFx{22%{transform:scale(1.18);box-shadow:0 0 28px #ef4444d9;filter:brightness(1.55)}55%{transform:scale(.97)}}
+@keyframes landTrapFx{20%{transform:translateX(-6px);box-shadow:0 0 24px #dc2626bf}40%{transform:translateX(6px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
+@keyframes landTreasureFx{35%{filter:brightness(1.7);box-shadow:0 0 28px #facc15cc}60%{transform:scale(1.12)}}
+@keyframes landHealFx{40%{filter:brightness(1.5);box-shadow:0 0 25px #22c55eb3}}
+@keyframes landShrineFx{40%{filter:brightness(1.55);box-shadow:0 0 27px #a855f7bf}}
+@keyframes landMysteryFx{35%{filter:hue-rotate(55deg) brightness(1.6);box-shadow:0 0 26px #6366f1bf}70%{filter:hue-rotate(-45deg) brightness(1.25)}}
+@keyframes landBossFx{35%{transform:scale(1.18);box-shadow:0 0 32px #f59e0be6;filter:brightness(1.6)}}
+@keyframes roadLandingFx{40%{filter:brightness(1.5);box-shadow:0 0 22px #be185da6}}
+@keyframes finalLandingFx{42%{filter:brightness(1.6);box-shadow:0 0 27px #a855f7b8}}
+.turnTransition{position:fixed;inset:0;z-index:7000;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;pointer-events:none;background:#0306097a;backdrop-filter:blur(2px);transition:opacity .18s ease,visibility .18s ease}.turnTransition.open{opacity:1;visibility:visible;pointer-events:auto}
+.turnTransitionInner{min-width:min(430px,84vw);padding:18px 28px;text-align:center;border:1px solid #78643a;border-radius:10px;background:radial-gradient(circle at 50% 0%,#d6b35a29,transparent 45%),linear-gradient(180deg,#151b21,#0a0e13);box-shadow:0 18px 55px #000b,inset 0 0 20px #0009;animation:turnCardIn .8s cubic-bezier(.18,.82,.23,1)}
+@keyframes turnCardIn{0%{opacity:0;transform:translateY(14px) scale(.9)}35%{opacity:1;transform:translateY(-2px) scale(1.04)}100%{transform:none}}
+.turnTransitionEyebrow{color:#aa9b79;font-size:8px;font-weight:900;letter-spacing:2px}.turnTransitionTitle{margin-top:4px;font-family:Georgia,'Times New Roman',serif;color:#e7cf91;font-size:25px;font-weight:900;letter-spacing:1.5px;text-shadow:0 2px 7px #000}.turnTransitionSub{margin-top:5px;color:#929aa2;font-size:8px}.turnTransition.mine .turnTransitionInner{border-color:#4e82b7;box-shadow:0 18px 55px #000b,0 0 25px #4589cd2e,inset 0 0 20px #0009}.turnTransition.mine .turnTransitionTitle{color:#dcecff}
+@media(prefers-reduced-motion:reduce){.movingPawnGhost{transition-duration:.001ms!important}.movingPawnGhost,.landNormal,.landMonster,.landTrap,.landTreasure,.landHeal,.landShrine,.landMystery,.landBoss,.roadLanding,.finalLanding,.turnTransitionInner{animation-duration:.001ms!important}}
+
+
+/* ==========================================================
+   STAGE 4B.1 — CONTINUOUSLY VISIBLE PAWN FIX
+   ========================================================== */
+.movingPawnGhost{
+  display:flex!important;
+  visibility:visible!important;
+  opacity:1!important;
+  z-index:9999!important;
+  will-change:left,top,transform;
+  transition-property:left,top!important;
+  transition-timing-function:cubic-bezier(.22,.72,.23,1)!important;
+}
+.movingPawnGhost.pawnHop{
+  opacity:1!important;
+  visibility:visible!important;
+}
+.movingPawnGhost::after{
+  content:"";
+  position:absolute;
+  inset:-5px;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.38);
+  box-shadow:0 0 10px rgba(255,255,255,.25);
+  pointer-events:none;
+}
+.movingPlayer1 .playerToken.p1,
+.movingPlayer2 .playerToken.p2{
+  transition:opacity .08s ease;
+}
+.movingPlayer1 .playerToken.p1,
+.movingPlayer2 .playerToken.p2{
+  opacity:0!important;
+}
+
+
+/* ==========================================================
+   STAGE 4C — SOUND & AMBIENCE v4.6.0
+   ========================================================== */
+#soundToggle{
+  grid-column:1 / -1;
+  border-color:#5e7048!important;
+  background:linear-gradient(180deg,#33472f,#1b2919)!important;
+  color:#d9efc9!important;
+}
+#soundToggle:hover:not(:disabled){filter:brightness(1.13)}
+#soundToggle:focus-visible{outline:2px solid #9fc882;outline-offset:2px}
+.audioPulse{
+  animation:audioPulseFx .35s ease;
+}
+@keyframes audioPulseFx{
+  0%{transform:scale(.96)}
+  60%{transform:scale(1.04)}
+  100%{transform:none}
+}
+
+
+/* ==========================================================
+   STAGE 4C.1 — CLEAN AUDIO PANEL + DYNAMIC SOUNDTRACK
+   ========================================================== */
+.audioPanel{
+  border:1px solid #46402f;
+  border-radius:7px;
+  padding:5px 6px;
+  background:
+    linear-gradient(180deg,#10161c,#090e12);
+  box-shadow:inset 0 0 9px #0007;
+}
+.audioPanelHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding-bottom:4px;
+  border-bottom:1px solid #302d25;
+}
+.audioPanelHead>span{
+  font-family:Georgia,'Times New Roman',serif;
+  color:#d7c183;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:1.2px;
+}
+.audioMuteBtn,
+.audioStepBtn{
+  width:24px!important;
+  min-width:24px!important;
+  height:21px!important;
+  min-height:21px!important;
+  padding:0!important;
+  margin:0!important;
+  display:flex!important;
+  align-items:center;
+  justify-content:center;
+  border-radius:4px!important;
+  font-family:system-ui,sans-serif!important;
+  font-size:10px!important;
+  line-height:1!important;
+}
+.audioMuteBtn{
+  background:linear-gradient(#384734,#1b2719)!important;
+  border-color:#556a4e!important;
+}
+.audioMuteBtn.muted{
+  background:linear-gradient(#49302f,#251716)!important;
+  border-color:#6a4745!important;
+}
+.audioRow{
+  display:grid;
+  grid-template-columns:40px 24px minmax(50px,1fr) 24px 30px;
+  gap:4px;
+  align-items:center;
+  min-height:27px;
+  border-bottom:1px solid rgba(61,57,47,.45);
+}
+.audioRow:last-of-type{border-bottom:0}
+.audioLabel{
+  font-size:7px;
+  font-weight:900;
+  letter-spacing:.8px;
+  color:#9e9684;
+}
+.audioMeter{
+  height:5px;
+  overflow:hidden;
+  border-radius:999px;
+  background:#171b1d;
+  border:1px solid #3b403d;
+}
+.audioMeter span{
+  display:block;
+  width:50%;
+  height:100%;
+  border-radius:inherit;
+  background:linear-gradient(90deg,#7d6c3d,#d4b968);
+  transition:width .15s ease;
+}
+.audioRow>b{
+  color:#cbbd97;
+  font-size:7px;
+  text-align:right;
+}
+.musicNowPlaying{
+  margin-top:3px;
+  padding-top:3px;
+  border-top:1px solid #302d25;
+  text-align:center;
+  color:#7f8c95;
+  font-size:6px;
+  letter-spacing:.4px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* supersede old full-width Stage 4C sound button style */
+#soundToggle{
+  grid-column:auto!important;
+  color:#d9efc9!important;
+}
+
 </style>
 </head>
 <body>
@@ -1977,7 +2167,7 @@ button:hover:not(:disabled){filter:brightness(1.12)}
       </div>
       <div id="multiplayerStatus">Connecting to Firebase...</div>
     </div>
-    <div class="small" style="margin-top:18px">Full-Face Dice Fix v4.3.6 · Collection progress saves in this browser</div>
+    <div class="small" style="margin-top:18px">Stage 4C.1 Dynamic Soundtrack v4.6.1 · Collection progress saves in this browser</div>
   </div>
 </div>
 
@@ -2049,6 +2239,32 @@ button:hover:not(:disabled){filter:brightness(1.12)}
 <button id="new" class="secondary">New Game</button><button id="menu" class="secondary">Main Menu</button>
   </div>
 </div>
+
+<div class="audioPanel">
+  <div class="audioPanelHead">
+    <span>🎵 AUDIO</span>
+    <button id="soundToggle" class="audioMuteBtn" type="button">🔊</button>
+  </div>
+
+  <div class="audioRow">
+    <span class="audioLabel">MUSIC</span>
+    <button id="musicDown" class="audioStepBtn" type="button">−</button>
+    <div class="audioMeter"><span id="musicMeterFill"></span></div>
+    <button id="musicUp" class="audioStepBtn" type="button">+</button>
+    <b id="musicVolumeLabel">55%</b>
+  </div>
+
+  <div class="audioRow">
+    <span class="audioLabel">SFX</span>
+    <button id="sfxDown" class="audioStepBtn" type="button">−</button>
+    <div class="audioMeter"><span id="sfxMeterFill"></span></div>
+    <button id="sfxUp" class="audioStepBtn" type="button">+</button>
+    <b id="sfxVolumeLabel">80%</b>
+  </div>
+
+  <div id="musicNowPlaying" class="musicNowPlaying">Exploration soundtrack</div>
+</div>
+
 <div id="msg" class="box streamlinedMsg"></div>
 <div id="monsterCardTemplate" style="
   display: none;
@@ -2243,6 +2459,17 @@ button:hover:not(:disabled){filter:brightness(1.12)}
 </aside>
 </div></div>
 
+<div id="battleOverlay" class="battleOverlay" aria-hidden="true"><div class="battleBackdrop"></div><div class="battleFrame"><div class="battleTopBar"><div><div class="battleEyebrow">⚔ MONSTER ENCOUNTER ⚔</div><div id="battleRegion" class="battleRegion">REGION</div></div><div id="battleSpectatorBadge" class="battleSpectatorBadge">ACTIVE PLAYER</div></div><div class="battleArena"><section class="battleCombatant"><div class="battleSideTitle">ADVENTURER</div><div id="battlePlayerPawn" class="battleHeroPawn">♟</div><div class="battleName">PLAYER</div><div class="battleHpBlock"><div class="battleStatLabel">HEALTH</div><div class="battleHpTrack"><span id="battleHpFill"></span></div><strong id="battleHpText">12 / 12</strong></div><div class="battleMiniStats"><div><span>⚔ ATTACK</span><b id="battlePlayerAttack">+0</b></div><div><span>💍 ACCESSORY</span><b id="battleAccessory">None</b></div></div></section><section class="battleCenter"><div class="battleVs">VS</div><div class="battleRequirement"><span>ROLL REQUIRED</span><strong id="battleRequired">3+</strong><small id="battleScaling"></small></div><div class="battleDiceStage"><div id="battleDie" class="battleDie face1"><span class="battlePip p1"></span><span class="battlePip p2"></span><span class="battlePip p3"></span><span class="battlePip p4"></span><span class="battlePip p5"></span><span class="battlePip p6"></span><span class="battlePip p7"></span><span class="battlePip p8"></span><span class="battlePip p9"></span></div></div><div class="battleRollReadout"><span>ROLLED</span><strong id="battleRollValue">—</strong><small id="battleRollDetail">Awaiting battle roll</small></div><div id="battleResult" class="battleResult hidden"><strong id="battleResultTitle"></strong><span id="battleResultText"></span></div><div id="battleActions" class="battleActions"><button id="battleFightBtn" class="battleFightBtn">⚔ FIGHT</button><button id="battlePassBtn" class="secondary">PASS</button></div></section><section class="battleCombatant"><div class="battleSideTitle">MONSTER</div><div id="battleMonsterArt" class="battleMonsterArt"><img id="battleMonsterImage" alt="Monster"></div><div id="battleMonsterName" class="battleMonsterName">MONSTER</div><div id="battleMonsterRarity" class="battleRarity">COMMON</div><div class="battleMiniStats"><div><span>💥 DAMAGE</span><b id="battleMonsterDamage">2</b></div><div><span>🗝 KEY CHANCE</span><b id="battleKeyChance">10%</b></div></div></section></div><div class="battleFooter"><span id="battleFooterText">Defeat the monster to claim its card and loot.</span></div></div></div>
+
+
+<div id="turnTransition" class="turnTransition" aria-hidden="true">
+  <div class="turnTransitionInner">
+    <div id="turnTransitionEyebrow" class="turnTransitionEyebrow">THE ADVENTURE CONTINUES</div>
+    <div id="turnTransitionTitle" class="turnTransitionTitle">PLAYER 2'S TURN</div>
+    <div id="turnTransitionSub" class="turnTransitionSub">Waiting for the next adventurer...</div>
+  </div>
+</div>
+
 <script>
 const REGIONS = [
   {
@@ -2389,6 +2616,11 @@ function clearRoadPenalties(p){
 const $=id=>document.getElementById(id);
 const d6=()=>Math.floor(Math.random()*6)+1;
 
+["pointerdown","keydown"].forEach(ev=>{
+ document.addEventListener(ev,()=>MQAudio.unlock(),{once:true,capture:true});
+});
+
+
 
 
 
@@ -2446,6 +2678,385 @@ function makeBoardEvents(){
  return EVENT_TYPES.map((ev,i)=>({...ev,space:picked[i]}));
 }
 
+
+const AUDIO_SETTINGS_KEY="monsterQuestAudioV1";
+const MQAudio={
+  ctx:null,
+  master:null,
+  sfxGain:null,
+  musicGain:null,
+  ambienceGain:null,
+  ambienceTimer:null,
+  musicTimer:null,
+  musicBeat:0,
+  musicKey:null,
+  enabled:true,
+  unlocked:false,
+  musicVolume:.55,
+  sfxVolume:.80,
+  currentAmbience:null,
+
+  load(){
+    try{
+      const saved=JSON.parse(localStorage.getItem(AUDIO_SETTINGS_KEY)||"{}");
+      if(typeof saved.enabled==="boolean")this.enabled=saved.enabled;
+      if(Number.isFinite(saved.musicVolume))this.musicVolume=Math.max(0,Math.min(1,saved.musicVolume));
+      if(Number.isFinite(saved.sfxVolume))this.sfxVolume=Math.max(0,Math.min(1,saved.sfxVolume));
+    }catch(e){}
+  },
+
+  save(){
+    try{
+      localStorage.setItem(AUDIO_SETTINGS_KEY,JSON.stringify({
+        enabled:this.enabled,
+        musicVolume:this.musicVolume,
+        sfxVolume:this.sfxVolume
+      }));
+    }catch(e){}
+  },
+
+  ensure(){
+    if(this.ctx)return true;
+    const Ctx=window.AudioContext||window.webkitAudioContext;
+    if(!Ctx)return false;
+
+    this.ctx=new Ctx();
+
+    this.master=this.ctx.createGain();
+    this.master.gain.value=this.enabled?1:0;
+    this.master.connect(this.ctx.destination);
+
+    this.sfxGain=this.ctx.createGain();
+    this.sfxGain.gain.value=.22*this.sfxVolume;
+    this.sfxGain.connect(this.master);
+
+    this.musicGain=this.ctx.createGain();
+    this.musicGain.gain.value=.12*this.musicVolume;
+    this.musicGain.connect(this.master);
+
+    this.ambienceGain=this.ctx.createGain();
+    this.ambienceGain.gain.value=.035*this.musicVolume;
+    this.ambienceGain.connect(this.master);
+
+    return true;
+  },
+
+  async unlock(){
+    if(!this.ensure())return;
+    try{
+      if(this.ctx.state==="suspended")await this.ctx.resume();
+      this.unlocked=true;
+      this.applyVolumes();
+      this.updateButton();
+      this.updateVolumeUI();
+      this.startAmbienceForCurrentRegion();
+      this.startMusicForCurrentContext();
+    }catch(e){}
+  },
+
+  applyVolumes(){
+    if(!this.ctx||!this.master)return;
+    const t=this.ctx.currentTime;
+    this.master.gain.cancelScheduledValues(t);
+    this.master.gain.linearRampToValueAtTime(this.enabled?1:0,t+.06);
+
+    if(this.sfxGain){
+      this.sfxGain.gain.cancelScheduledValues(t);
+      this.sfxGain.gain.linearRampToValueAtTime(.22*this.sfxVolume,t+.08);
+    }
+    if(this.musicGain){
+      this.musicGain.gain.cancelScheduledValues(t);
+      this.musicGain.gain.linearRampToValueAtTime(.12*this.musicVolume,t+.12);
+    }
+    if(this.ambienceGain){
+      this.ambienceGain.gain.cancelScheduledValues(t);
+      this.ambienceGain.gain.linearRampToValueAtTime(.035*this.musicVolume,t+.12);
+    }
+  },
+
+  setEnabled(on){
+    this.enabled=!!on;
+    this.save();
+    this.applyVolumes();
+    this.updateButton();
+    if(this.enabled){
+      this.startAmbienceForCurrentRegion();
+      this.startMusicForCurrentContext();
+    }else{
+      this.stopAmbience();
+      this.stopMusic();
+    }
+  },
+
+  toggle(){this.setEnabled(!this.enabled)},
+
+  setMusicVolume(v){
+    this.musicVolume=Math.max(0,Math.min(1,v));
+    this.save();
+    this.applyVolumes();
+    this.updateVolumeUI();
+    if(this.musicVolume>0){
+      this.startAmbienceForCurrentRegion();
+      this.startMusicForCurrentContext();
+    }else{
+      this.stopMusic();
+    }
+  },
+
+  setSfxVolume(v){
+    this.sfxVolume=Math.max(0,Math.min(1,v));
+    this.save();
+    this.applyVolumes();
+    this.updateVolumeUI();
+  },
+
+  changeMusic(delta){this.setMusicVolume(this.musicVolume+delta)},
+  changeSfx(delta){this.setSfxVolume(this.sfxVolume+delta)},
+
+  updateButton(){
+    const b=$("soundToggle");
+    if(!b)return;
+    b.textContent=this.enabled?"🔊":"🔇";
+    b.title=this.enabled?"Mute all audio":"Enable audio";
+    b.classList.toggle("muted",!this.enabled);
+  },
+
+  updateVolumeUI(){
+    const mp=Math.round(this.musicVolume*100);
+    const sp=Math.round(this.sfxVolume*100);
+    if($("musicVolumeLabel"))$("musicVolumeLabel").textContent=`${mp}%`;
+    if($("sfxVolumeLabel"))$("sfxVolumeLabel").textContent=`${sp}%`;
+    if($("musicMeterFill"))$("musicMeterFill").style.width=`${mp}%`;
+    if($("sfxMeterFill"))$("sfxMeterFill").style.width=`${sp}%`;
+  },
+
+  osc(freq,duration=.12,type="sine",gain=.12,when=0,slideTo=null,bus="sfx"){
+    if(!this.enabled||!this.unlocked||!this.ensure())return;
+    const t=this.ctx.currentTime+when;
+    const o=this.ctx.createOscillator();
+    const g=this.ctx.createGain();
+    o.type=type;
+    o.frequency.setValueAtTime(freq,t);
+    if(slideTo)o.frequency.exponentialRampToValueAtTime(Math.max(20,slideTo),t+duration);
+    g.gain.setValueAtTime(.0001,t);
+    g.gain.exponentialRampToValueAtTime(Math.max(.001,gain),t+.015);
+    g.gain.exponentialRampToValueAtTime(.0001,t+duration);
+    o.connect(g);
+    g.connect(bus==="music"?this.musicGain:bus==="ambience"?this.ambienceGain:this.sfxGain);
+    o.start(t);o.stop(t+duration+.04);
+  },
+
+  noise(duration=.12,gain=.06,when=0,filterFreq=1200,bus="sfx"){
+    if(!this.enabled||!this.unlocked||!this.ensure())return;
+    const rate=this.ctx.sampleRate;
+    const buffer=this.ctx.createBuffer(1,Math.max(1,Math.floor(rate*duration)),rate);
+    const data=buffer.getChannelData(0);
+    for(let i=0;i<data.length;i++)data[i]=Math.random()*2-1;
+    const src=this.ctx.createBufferSource();
+    const filt=this.ctx.createBiquadFilter();
+    const g=this.ctx.createGain();
+    filt.type="lowpass";filt.frequency.value=filterFreq;
+    const t=this.ctx.currentTime+when;
+    g.gain.setValueAtTime(gain,t);
+    g.gain.exponentialRampToValueAtTime(.0001,t+duration);
+    src.buffer=buffer;src.connect(filt);filt.connect(g);
+    g.connect(bus==="music"?this.musicGain:bus==="ambience"?this.ambienceGain:this.sfxGain);
+    src.start(t);src.stop(t+duration+.02);
+  },
+
+  play(name){
+    if(!this.enabled||!this.unlocked)return;
+    switch(name){
+      case "dice":
+        this.noise(.08,.035,0,2200);this.noise(.07,.03,.09,1800);this.noise(.06,.025,.17,1600);
+        this.osc(170,.08,"triangle",.05,.02,120);break;
+      case "step":
+        this.osc(180,.045,"triangle",.025,0,130);break;
+      case "land":
+        this.osc(150,.08,"sine",.045,0,105);break;
+      case "monster":
+        this.osc(130,.24,"sawtooth",.07,0,75);this.osc(196,.16,"square",.025,.05,122);break;
+      case "damage":
+        this.noise(.18,.07,0,900);this.osc(105,.18,"sawtooth",.07,0,55);break;
+      case "heal":
+        this.osc(523,.16,"sine",.045,0);this.osc(659,.18,"sine",.04,.08);this.osc(784,.2,"sine",.035,.16);break;
+      case "treasure":
+        this.osc(660,.12,"triangle",.04,0);this.osc(880,.14,"triangle",.04,.1);this.osc(1100,.18,"triangle",.035,.2);break;
+      case "mystery":
+        this.osc(440,.16,"sine",.035,0,620);this.osc(620,.18,"sine",.03,.12,390);break;
+      case "boss":
+        this.osc(92,.45,"sawtooth",.09,0,55);this.noise(.3,.05,.06,700);this.osc(138,.3,"square",.025,.12,82);break;
+      case "turn":
+        this.osc(392,.11,"triangle",.035,0);this.osc(523,.14,"triangle",.04,.09);break;
+      case "victory":
+        [523,659,784,1046].forEach((f,i)=>this.osc(f,.28,"triangle",.045,i*.11));break;
+      case "defeat":
+        this.osc(220,.22,"sawtooth",.05,0,155);this.osc(155,.3,"sawtooth",.045,.15,82);break;
+      case "equip":
+        this.osc(587,.11,"triangle",.035,0);this.osc(880,.18,"triangle",.04,.1);break;
+      case "gate":
+        this.osc(140,.18,"square",.035,0,95);this.osc(210,.2,"triangle",.03,.08,125);break;
+    }
+  },
+
+  contextKey(){
+    try{
+      if(!G)return "menu";
+      const phase=G.phase||"move";
+      const p=player();
+      if(phase==="finalBoss")return "finalBoss";
+      if(phase==="boss")return "boss";
+      if(phase==="encounter")return "battle";
+      if(p.locationMode==="finalRoad"||p.locationMode==="victoryRoad")return "dragon";
+      const r=REGIONS[G.regionOrder[currentRegionIndex(p)]];
+      return (r?.name||"").toLowerCase();
+    }catch(e){return "menu"}
+  },
+
+  musicDescriptor(key){
+    if(key==="battle")return {label:"Monster Battle",root:146.83,scale:[0,3,5,7,10],tempo:520,style:"battle"};
+    if(key==="boss")return {label:"Regional Boss",root:110,scale:[0,3,5,6,10],tempo:460,style:"boss"};
+    if(key==="finalBoss")return {label:"Ancient Dragon",root:82.41,scale:[0,3,5,7,10],tempo:400,style:"finalBoss"};
+    if(key==="dragon")return {label:"Dragon's Ascent",root:98,scale:[0,3,5,7,10],tempo:650,style:"dragon"};
+    if(key.includes("whispering"))return {label:"Whispering Woods",root:196,scale:[0,2,3,7,9],tempo:850,style:"forest"};
+    if(key.includes("sunscorch"))return {label:"Sunscorch Sands",root:174.61,scale:[0,1,5,7,8],tempo:760,style:"desert"};
+    if(key.includes("frostpeak"))return {label:"Frostpeak Mountains",root:220,scale:[0,2,5,7,9],tempo:900,style:"frost"};
+    if(key.includes("lava"))return {label:"Lava Lakes",root:130.81,scale:[0,3,5,6,10],tempo:620,style:"lava"};
+    if(key.includes("swamp"))return {label:"Stinky Swamp",root:164.81,scale:[0,3,5,7,10],tempo:880,style:"swamp"};
+    if(key.includes("fallen"))return {label:"The Fallen Kingdom",root:146.83,scale:[0,2,3,7,8],tempo:900,style:"fallen"};
+    if(key.includes("drowned"))return {label:"The Drowned Coast",root:174.61,scale:[0,2,5,7,10],tempo:860,style:"drowned"};
+    if(key.includes("deadlands"))return {label:"The Deadlands",root:123.47,scale:[0,3,5,6,10],tempo:960,style:"dead"};
+    if(key.includes("shattered"))return {label:"The Shattered Realm",root:207.65,scale:[0,2,4,7,9],tempo:720,style:"arcane"};
+    if(key.includes("iron"))return {label:"The Iron Wastes",root:138.59,scale:[0,2,5,7,10],tempo:640,style:"iron"};
+    return {label:"Monster Quest",root:174.61,scale:[0,2,5,7,9],tempo:900,style:"default"};
+  },
+
+  midiRatio(semitones){return Math.pow(2,semitones/12)},
+
+  playMusicBeat(desc){
+    if(!this.enabled||!this.unlocked||this.musicVolume<=0)return;
+    const beat=this.musicBeat++;
+    const degree=desc.scale[beat%desc.scale.length];
+    const note=desc.root*this.midiRatio(degree);
+    const low=desc.root/2;
+
+    // Constant soft bass pulse.
+    if(beat%2===0)this.osc(low,.55,"sine",.025,0,low*.94,"music");
+
+    // Region melody.
+    if(desc.style==="forest"||desc.style==="frost"||desc.style==="arcane"){
+      this.osc(note*2,.36,"sine",.018,.04,note*2.01,"music");
+      if(beat%4===2)this.osc(note*3,.22,"triangle",.012,.15,null,"music");
+    }else if(desc.style==="desert"){
+      this.osc(note,.22,"triangle",.022,.03,note*.97,"music");
+      if(beat%3===0)this.noise(.06,.012,.12,1500,"music");
+    }else if(desc.style==="lava"||desc.style==="iron"){
+      this.osc(note,.18,"square",.012,.02,note*.95,"music");
+      if(beat%2===0)this.noise(.07,.015,.09,700,"music");
+    }else if(desc.style==="swamp"||desc.style==="dead"||desc.style==="fallen"||desc.style==="drowned"){
+      this.osc(note,.42,"sine",.016,.03,note*.98,"music");
+      if(beat%4===1)this.osc(note/2,.7,"sine",.012,.08,null,"music");
+    }else if(desc.style==="dragon"){
+      this.osc(note,.36,"triangle",.022,.02,null,"music");
+      if(beat%2===0)this.noise(.08,.013,.12,850,"music");
+    }else if(desc.style==="battle"){
+      this.osc(note,.16,"sawtooth",.018,.02,note*.96,"music");
+      this.noise(.05,.014,.13,1100,"music");
+    }else if(desc.style==="boss"){
+      this.osc(note,.22,"sawtooth",.022,.02,note*.94,"music");
+      if(beat%2===0)this.noise(.08,.018,.08,850,"music");
+    }else if(desc.style==="finalBoss"){
+      this.osc(note,.25,"sawtooth",.026,.02,note*.92,"music");
+      this.osc(low,.6,"square",.012,.02,null,"music");
+      this.noise(.09,.02,.11,700,"music");
+    }else{
+      this.osc(note,.35,"sine",.016,.04,null,"music");
+    }
+  },
+
+  startMusicForCurrentContext(){
+    if(!this.enabled||!this.unlocked||this.musicVolume<=0)return;
+    const key=this.contextKey();
+    if(key===this.musicKey&&this.musicTimer)return;
+
+    this.stopMusic();
+    this.musicKey=key;
+    this.musicBeat=0;
+    const desc=this.musicDescriptor(key);
+
+    if($("musicNowPlaying"))$("musicNowPlaying").textContent=`♫ ${desc.label}`;
+
+    const beat=()=>{
+      if(!this.enabled||!this.unlocked||this.musicVolume<=0)return;
+      this.playMusicBeat(desc);
+    };
+
+    beat();
+    this.musicTimer=setInterval(beat,desc.tempo);
+  },
+
+  stopMusic(){
+    if(this.musicTimer){clearInterval(this.musicTimer);this.musicTimer=null}
+    this.musicKey=null;
+    this.musicBeat=0;
+  },
+
+  stopAmbience(){
+    if(this.ambienceTimer){clearInterval(this.ambienceTimer);this.ambienceTimer=null}
+    this.currentAmbience=null;
+  },
+
+  ambienceKey(){
+    try{
+      if(!G)return "menu";
+      const p=player();
+      if(p.locationMode==="finalRoad"||p.locationMode==="finalBoss"||p.locationMode==="victoryRoad")return "dragon";
+      const r=REGIONS[G.regionOrder[currentRegionIndex(p)]];
+      return (r?.name||"").toLowerCase();
+    }catch(e){return "menu"}
+  },
+
+  startAmbienceForCurrentRegion(){
+    if(!this.enabled||!this.unlocked||this.musicVolume<=0)return;
+    const key=this.ambienceKey();
+    if(key===this.currentAmbience&&this.ambienceTimer)return;
+    this.stopAmbience();
+    this.currentAmbience=key;
+
+    const tick=()=>{
+      if(!this.enabled||!this.unlocked)return;
+      const k=this.currentAmbience||"";
+      if(k.includes("whispering")||k.includes("swamp")){
+        this.osc(110,.7,"sine",.012,0,95,"ambience");
+        if(Math.random()<.45)this.osc(900,.09,"sine",.01,.25,720,"ambience");
+      }else if(k.includes("sunscorch")){
+        this.noise(.5,.009,0,500,"ambience");
+      }else if(k.includes("frostpeak")){
+        this.noise(.7,.008,0,1300,"ambience");
+      }else if(k.includes("lava")){
+        this.osc(72,.8,"sine",.014,0,60,"ambience");
+        if(Math.random()<.45)this.noise(.14,.015,.2,700,"ambience");
+      }else if(k.includes("fallen")||k.includes("deadlands")){
+        this.osc(82,.9,"sine",.012,0,65,"ambience");
+      }else if(k.includes("drowned")){
+        this.noise(.8,.008,0,650,"ambience");
+        this.osc(95,.7,"sine",.01,0,80,"ambience");
+      }else if(k.includes("shattered")){
+        this.osc(260,.5,"sine",.01,0,390,"ambience");
+      }else if(k.includes("iron")){
+        if(Math.random()<.55)this.osc(115,.07,"square",.012,0,90,"ambience");
+      }else if(k==="dragon"){
+        this.osc(65,.9,"sine",.015,0,52,"ambience");
+        if(Math.random()<.4)this.noise(.18,.012,.2,800,"ambience");
+      }
+    };
+
+    tick();
+    this.ambienceTimer=setInterval(tick,2200);
+  }
+};
+MQAudio.load();
+
 let G;
 
 function chooseRarity(){
@@ -2481,6 +3092,8 @@ function newGame(){ setEncounterMode(false);
    active:0,
    multiplayer:null,
    phase:"move",
+   movementAnimation:null,
+   movementBusy:false,
    encounter:null,
    pendingMovementRoll:null,
    boss:null,
@@ -2564,7 +3177,7 @@ function render(){
        </div>
        <div class="regionBossTag">${ri<currentRegionIndex(p)?"✅ CLEARED":ri===currentRegionIndex(p)?"📍 CURRENT":"🔒"} ${region.boss.icon} ${region.boss.name}</div>
      </div>
-     <div class="townTile landmark townLandmark ${isCurrent&&localSpace(p)===0?"me":""}">
+     <div class="townTile landmark townLandmark ${isCurrent&&localSpace(p)===0?"me":""}" data-region-town="${ri}">
        <div class="landmarkIcon">🏰</div>
        <div><b>TOWN</b><span class="small">Region starting area</span></div>
        ${G.players.map((pl,i)=>playerIsAtTown(pl,ri)?playerTokenHtml(i):"").join("")}
@@ -2583,10 +3196,10 @@ function render(){
      if(isCurrent&&localSpace(p)===s)cls+=" me";
      let icon=s===20?"🔒":isMonsterTile?"👾":event?event.icon:"";
      let token=G.players.map((pl,i)=>playerIsAtBoardSpace(pl,ri,s)?playerTokenHtml(i):"").join("");
-     html+=`<div class="${cls}"><b>${s}</b><span class="icon">${icon}</span>${token}</div>`;
+     html+=`<div class="${cls}" data-region="${ri}" data-space="${s}"><b>${s}</b><span class="icon">${icon}</span>${token}</div>`;
    }
    html+=`</div>
-   <div class="townTile landmark bossLandmark ${isCurrent&&p.locationMode==="bossRoom"?"me":""}">
+   <div class="townTile landmark bossLandmark ${isCurrent&&p.locationMode==="bossRoom"?"me":""}" data-region-boss="${ri}">
      <div class="landmarkIcon">👑</div>
      <div><b>BOSS ROOM</b><span class="small">${region.boss.icon} ${region.boss.name}</span></div>
      ${G.players.map((pl,i)=>playerIsAtBossRoom(pl,ri)?playerTokenHtml(i):"").join("")}
@@ -2597,7 +3210,7 @@ function render(){
      G.roads[ri].forEach((rp,idx)=>{
        const roadTokens=G.players.map((pl,i)=>pl.locationMode==="road"&&pl.roadRegion===ri&&pl.roadPos===idx+1?playerTokenHtml(i):"").join("");
        const onRoad=roadTokens!=="";
-       html+=`<div class="roadSpace ${onRoad?"me":""}"><b>${idx+1}. ${rp.icon}</b><br>${rp.name}${roadTokens}</div>`;
+       html+=`<div class="roadSpace ${onRoad?"me":""}" data-road-region="${ri}" data-road-space="${idx+1}"><b>${idx+1}. ${rp.icon}</b><br>${rp.name}${roadTokens}</div>`;
      });
      html+=`</div><div class="small">→ 🏘️ Next Region Town</div>`;
    }
@@ -2605,7 +3218,7 @@ function render(){
  });
  html+=`<div class="region finalRegion ${(p.locationMode==="victoryRoad"||p.locationMode==="finalRoad"||p.locationMode==="finalBoss")?"current":""}">
    <div class="rh regionHeader finalHeader"><div><div class="regionNumber">FINAL REGION</div><div class="regionTitle">🐉 THE DRAGON'S ASCENT</div><div class="small regionSubtitle">Victory Road · 10-space approach · Ancient Dragon</div></div><div class="regionBossTag">${(p.locationMode==="victoryRoad"||p.locationMode==="finalRoad"||p.locationMode==="finalBoss")?"📍 CURRENT":"🔒"}</div></div>
-   <div class="townTile landmark victoryLandmark ${p.locationMode==="victoryRoad"?"me":""}">
+   <div class="townTile landmark victoryLandmark ${p.locationMode==="victoryRoad"?"me":""}" data-final-start="1">
      <div class="landmarkIcon">🏆</div><div><b>VICTORY ROAD</b><span class="small">Final-region starting point</span></div>
      ${G.players.map((pl,i)=>pl.locationMode==="victoryRoad"?playerTokenHtml(i):"").join("")}
    </div>
@@ -2613,10 +3226,10 @@ function render(){
  for(let s=1;s<=10;s++){
    const finalTokens=G.players.map((pl,i)=>pl.locationMode==="finalRoad"&&pl.finalRoadPos===s?playerTokenHtml(i):"").join("");
    const onFinalRoad=finalTokens!=="";
-   html+=`<div class="space ${onFinalRoad?"me":""}"><b>${s}</b>${finalTokens}</div>`;
+   html+=`<div class="space ${onFinalRoad?"me":""}" data-final-space="${s}"><b>${s}</b>${finalTokens}</div>`;
  }
  html+=`</div>
-   <div class="townTile landmark dragonLandmark ${p.locationMode==="finalBoss"?"me":""}">
+   <div class="townTile landmark dragonLandmark ${p.locationMode==="finalBoss"?"me":""}" data-final-boss="1">
      <div class="landmarkIcon">🐉</div><div><b>ANCIENT DRAGON</b><span class="small">Final Boss · 3 successful hits</span></div>
      ${G.players.map((pl,i)=>pl.locationMode==="finalBoss"?playerTokenHtml(i):"").join("")}
    </div>
@@ -2627,6 +3240,8 @@ $("collection").innerHTML=p.cards.map(c=>
  ).join("") || `<div class="cc">No cards yet — optional encounters are your chance to get stronger.</div>`;
  renderMultiplayerPlayerCards();
  applyTurnLock();
+ MQAudio.startAmbienceForCurrentRegion();
+ MQAudio.startMusicForCurrentContext();
 }
 
 function showMessage(t){$("msg").innerHTML=t;}
@@ -2636,26 +3251,23 @@ function show(id){$(id).classList.remove("hidden");}
 
 
 function rollFinalRoad(){
- const p=player();
- const base=d6();
- const bonus=movementBonus(p);
- const n=base+bonus;
- animateDiceResult(bonus?`🎲 ${base} + 💍1 = ${n}`:`🎲 ${n}`);
- $("roll").disabled=true;
- p.finalRoadPos+=n;
- syncMyMultiplayerState();
- if(p.finalRoadPos>=10){
-   p.finalRoadPos=10;
-   p.locationMode="finalBoss";
-   p.turnPhase="finalBoss";
-   G.phase="finalBoss";
-   render();
-   beginFinalBoss();
-   return;
- }
- $("end").disabled=false;
- render();
- showMessage(`🐉 <b>Final Boss Region</b><br>You rolled ${n} and moved to space ${p.finalRoadPos}/10.<br><br>Press <b>➡️ End Turn</b>.`);
+ const p=player();if(G.movementBusy)return;
+ const base=d6(),bonus=movementBonus(p),n=base+bonus;
+ animateDiceResult(bonus?`🎲 ${base} + 💍1 = ${n}`:`🎲 ${n}`);$("roll").disabled=true;$("end").disabled=true;
+ const oldPos=p.finalRoadPos,newPos=Math.min(10,oldPos+n);G.movementBusy=true;
+ const animation={kind:"final",region:4,from:oldPos,to:newPos,playerIndex:G.multiplayer?G.multiplayer.playerIndex:G.active,nonce:`${Date.now()}-${Math.random().toString(36).slice(2,7)}`};
+ showMessage(`🐉 You rolled <b>${n}</b>. Climbing the Dragon's Ascent...`);
+ startSharedMovementAnimation(animation).then(()=>{
+   p.finalRoadPos=newPos;endSharedMovementAnimation();
+   if(p.finalRoadPos>=10){
+     p.finalRoadPos=10;p.locationMode="finalBoss";p.turnPhase="finalBoss";G.phase="finalBoss";render();
+     const last=document.querySelector('[data-final-space="10"]');if(last){last.classList.add("finalLanding");setTimeout(()=>last.classList.remove("finalLanding"),900)}
+     beginFinalBoss();return;
+   }
+   $("end").disabled=false;render();
+   const el=document.querySelector(`[data-final-space="${p.finalRoadPos}"]`);if(el){el.classList.add("finalLanding");setTimeout(()=>el.classList.remove("finalLanding"),850)}
+   showMessage(`🐉 <b>Dragon's Ascent</b><br>You rolled ${n} and moved to space ${p.finalRoadPos}/10.<br><br>Press <b>➡️ End Turn</b>.`);syncMultiplayerAll();
+ });
 }
 
 function beginFinalBoss(){ setEncounterMode(false);
@@ -2803,6 +3415,7 @@ function setRealisticDieFace(value){
 }
 
 function animateDiceResult(text){
+ MQAudio.play("dice");
  const face=$("dieFaceVisible");
  const valueEl=$("rollValue");
  const detailEl=$("rollDetail");
@@ -2842,6 +3455,7 @@ function animateDiceResult(text){
  },55);
 }
 function flashPlayerChange(index,type){
+ MQAudio.play(type==="heal"?"heal":"damage");
  const cards=document.querySelectorAll(".playerHud");
  const card=cards[index];
  if(!card)return;
@@ -2853,20 +3467,24 @@ function announceTurnTransition(){
  pulseElement(banner,"turnPop",650);
 }
 function animateMonsterReveal(){
- const card=$("monsterCard");
+ const card=$("monsterCardTemplate");
  if(!card)return;
  pulseElement(card,"monsterReveal",700);
 }
 function animateBossPanel(){
+ MQAudio.play("boss");
+ setTimeout(()=>MQAudio.startMusicForCurrentContext(),0);
  const boss=$("boss");
  if(!boss)return;
  pulseElement(boss,"bossReveal",800);
 }
 function animateVictory(){
+ MQAudio.play("victory");
  document.body.classList.add("victoryBurst");
  setTimeout(()=>document.body.classList.remove("victoryBurst"),1800);
 }
 function animateDeath(){
+ MQAudio.play("defeat");
  document.body.classList.add("deathFade");
  setTimeout(()=>document.body.classList.remove("deathFade"),1200);
 }
@@ -2967,69 +3585,158 @@ function markVisitedEvent(p,region,space){
  }
 }
 
-function completeBoardMovement(baseRoll){
- const p=player();
- ensureVisitedEvents(p);
 
- const moveBonus=movementBonus(p);
- const roll=baseRoll+moveBonus;
- animateDiceResult(moveBonus?`🎲 ${baseRoll} + 💍${moveBonus} = ${roll}`:`🎲 ${roll}`);
- $("roll").disabled=true;
+let lastRemoteMovementNonce=null;
+let turnTransitionTimer=null;
+function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
 
- const region=currentRegionIndex(p);
- const oldLocal=(p.locationMode==="town")?0:localSpace(p);
- const newLocal=Math.min(20,oldLocal+roll);
+function movementTargetElement(kind,region,space){
+ if(kind==="board"){
+   if(space===0)return document.querySelector(`[data-region-town="${region}"]`);
+   return document.querySelector(`[data-region="${region}"][data-space="${space}"]`);
+ }
+ if(kind==="road"){
+   if(space===0)return document.querySelector(`[data-region-boss="${region}"]`);
+   if(space>=7)return document.querySelector(`[data-region-town="${region+1}"]`);
+   return document.querySelector(`[data-road-region="${region}"][data-road-space="${space}"]`);
+ }
+ if(kind==="final"){
+   if(space===0)return document.querySelector(`[data-final-start="1"]`);
+   return document.querySelector(`[data-final-space="${Math.min(space,10)}"]`);
+ }
+ return null;
+}
+function createMovingPawnGhost(playerIndex,startEl){
+ if(!startEl)return null;
+ const rect=startEl.getBoundingClientRect();
+ const ghost=document.createElement("div");
+ ghost.className=`movingPawnGhost p${playerIndex+1}`;
+ ghost.textContent=String(playerIndex+1);
+ ghost.style.left=`${rect.left+rect.width/2}px`;
+ ghost.style.top=`${rect.top+rect.height/2}px`;
+ ghost.style.opacity="1";
+ ghost.style.visibility="visible";
+ document.body.appendChild(ghost);
 
- p.position=region*20+newLocal;
- p.locationMode="board";
- p.turnPhase="move";
+ // Allow the moving pawn to paint first, then hide the stationary token.
+ requestAnimationFrame(()=>{
+   requestAnimationFrame(()=>{
+     document.body.classList.add(`movingPlayer${playerIndex+1}`);
+   });
+ });
+ return ghost;
+}
+async function moveGhostTo(ghost,targetEl,duration=190){
+ if(!ghost||!targetEl)return;
+ MQAudio.play("step");
+ const rect=targetEl.getBoundingClientRect();
 
- // Resolve the landing FIRST. Firebase receives the completed result afterwards.
+ ghost.style.display="flex";
+ ghost.style.opacity="1";
+ ghost.style.visibility="visible";
+ ghost.style.zIndex="9999";
+
+ ghost.classList.remove("pawnHop");
+ void ghost.offsetWidth;
+ ghost.classList.add("pawnHop");
+
+ ghost.style.transitionDuration=`${duration}ms`;
+
+ requestAnimationFrame(()=>{
+   ghost.style.left=`${rect.left+rect.width/2}px`;
+   ghost.style.top=`${rect.top+rect.height/2}px`;
+ });
+
+ await sleep(duration+35);
+}
+async function animateMovementPath(animation){
+ if(!animation)return;
+ const {kind="board",region=0,from=0,to=0,playerIndex=0}=animation;
+ const startEl=movementTargetElement(kind,region,from);
+ if(!startEl)return;
+ const ghost=createMovingPawnGhost(playerIndex,startEl);
+ if(!ghost)return;
+ const maxTo=kind==="road"?Math.min(to,7):kind==="final"?Math.min(to,10):to;
+ for(let s=from+1;s<=maxTo;s++){
+   const el=movementTargetElement(kind,region,s);
+   if(el)await moveGhostTo(ghost,el,185);
+ }
+ ghost.classList.remove("pawnHop");
+ ghost.classList.add("pawnArrive");
+ await sleep(120);
+
+ // Reveal the real board token before removing the moving pawn.
+ document.body.classList.remove(`movingPlayer${playerIndex+1}`);
+ await sleep(40);
+
+ ghost.remove();
+}
+function startSharedMovementAnimation(animation){
+ G.movementAnimation=animation;
+ if(G.multiplayer)syncMultiplayerTurnState();
+ return animateMovementPath(animation);
+}
+function endSharedMovementAnimation(){G.movementAnimation=null;G.movementBusy=false}
+function landingElement(region,space){return document.querySelector(`[data-region="${region}"][data-space="${space}"]`)}
+function triggerLandingEffect(region,space,type="normal"){
+ const el=landingElement(region,space);if(!el)return;
+ if(type==="monster")MQAudio.play("monster");
+ else if(type==="trap")MQAudio.play("damage");
+ else if(type==="treasure")MQAudio.play("treasure");
+ else if(type==="campfire")MQAudio.play("heal");
+ else if(type==="mystery")MQAudio.play("mystery");
+ else if(type==="boss")MQAudio.play("gate");
+ else MQAudio.play("land");
+ const cls={monster:"landMonster",trap:"landTrap",treasure:"landTreasure",campfire:"landHeal",shrine:"landShrine",mystery:"landMystery",boss:"landBoss",normal:"landNormal"}[type]||"landNormal";
+ el.classList.remove("landMonster","landTrap","landTreasure","landHeal","landShrine","landMystery","landBoss","landNormal");
+ void el.offsetWidth;el.classList.add(cls);setTimeout(()=>el.classList.remove(cls),900);
+}
+function showTurnTransition(nextPlayer,isMine){
+ MQAudio.play("turn");
+ const overlay=$("turnTransition");if(!overlay)return;
+ if(turnTransitionTimer)clearTimeout(turnTransitionTimer);
+ $("turnTransitionEyebrow").textContent=isMine?"YOUR ADVENTURE CONTINUES":"THE ADVENTURE CONTINUES";
+ $("turnTransitionTitle").textContent=`PLAYER ${nextPlayer+1}'S TURN`;
+ $("turnTransitionSub").textContent=isMine?"Your controls are ready.":"Waiting for the other adventurer...";
+ overlay.classList.toggle("mine",!!isMine);overlay.classList.add("open");overlay.setAttribute("aria-hidden","false");
+ turnTransitionTimer=setTimeout(()=>{overlay.classList.remove("open","mine");overlay.setAttribute("aria-hidden","true")},950);
+}
+async function playRemoteMovementAnimation(animation){
+ if(!animation||animation.nonce===lastRemoteMovementNonce)return;
+ lastRemoteMovementNonce=animation.nonce;await animateMovementPath(animation);
+}
+function resolveBoardLanding(p,region,oldLocal,newLocal,roll){
+ p.position=region*20+newLocal;p.locationMode="board";p.turnPhase="move";endSharedMovementAnimation();
  if(newLocal===20){
-   p.locationMode="gate";
-   beginBossGate();
-   render();
-   syncMultiplayerAll();
-   return;
+   p.locationMode="gate";render();triggerLandingEffect(region,newLocal,"boss");beginBossGate();syncMultiplayerAll();return;
  }
-
- if(G.monsterTiles[region] && G.monsterTiles[region].includes(newLocal)){
-   render();
-   beginOptionalEncounter(drawFreshMonster(region));
-   return;
+ if(G.monsterTiles[region]&&G.monsterTiles[region].includes(newLocal)){
+   render();triggerLandingEffect(region,newLocal,"monster");beginOptionalEncounter(drawFreshMonster(region));return;
  }
-
- const regionEvents=Array.isArray(G.worldEvents[region]) ? G.worldEvents[region] : [];
+ const regionEvents=Array.isArray(G.worldEvents[region])?G.worldEvents[region]:[];
  const event=regionEvents.find(e=>Number(e.space)===Number(newLocal));
-
  if(event){
-   if(event.type==="mystery"){
-     render();
-     resolveBoardEvent(event,p,region);
-     return;
-   }
-
-   if(!hasVisitedEvent(p,region,event.space)){
-     markVisitedEvent(p,region,event.space);
-     render();
-     resolveBoardEvent(event,p,region);
-     return;
-   }
+   render();triggerLandingEffect(region,newLocal,event.type);
+   if(event.type==="mystery"){resolveBoardEvent(event,p,region);return}
+   if(!hasVisitedEvent(p,region,event.space)){markVisitedEvent(p,region,event.space);resolveBoardEvent(event,p,region);return}
  }
-
- render();
- $("roll").disabled=true;
- $("fight").disabled=true;
- $("pass").disabled=true;
- $("retreat").disabled=true;
- $("end").disabled=false;
-
+ render();triggerLandingEffect(region,newLocal,"normal");
+ $("roll").disabled=true;$("fight").disabled=true;$("pass").disabled=true;$("retreat").disabled=true;$("end").disabled=false;
  showMessage(`You rolled <b>${roll}</b> and moved from ${oldLocal===0?"🏘️ Town":"space "+oldLocal} to <b>space ${newLocal}</b> of Region ${region+1}.<br><br>🎲 <b>Your movement roll is complete.</b><br>Press <b>➡️ End Turn</b> to continue.`);
-
- // Empty-square movement is one completed action.
  syncMultiplayerAll();
 }
 
+function completeBoardMovement(baseRoll){
+ const p=player();ensureVisitedEvents(p);if(G.movementBusy)return;
+ const moveBonus=movementBonus(p),roll=baseRoll+moveBonus;
+ animateDiceResult(moveBonus?`🎲 ${baseRoll} + 💍${moveBonus} = ${roll}`:`🎲 ${roll}`);
+ $("roll").disabled=true;$("fight").disabled=true;$("pass").disabled=true;$("retreat").disabled=true;$("end").disabled=true;
+ const region=currentRegionIndex(p),oldLocal=(p.locationMode==="town")?0:localSpace(p),newLocal=Math.min(20,oldLocal+roll);
+ G.movementBusy=true;
+ const animation={kind:"board",region,from:oldLocal,to:newLocal,playerIndex:G.multiplayer?G.multiplayer.playerIndex:G.active,nonce:`${Date.now()}-${Math.random().toString(36).slice(2,7)}`};
+ showMessage(`🎲 You rolled <b>${roll}</b>.<br>Your adventurer is moving ${newLocal-oldLocal} space${newLocal-oldLocal===1?"":"s"}...`);
+ startSharedMovementAnimation(animation).then(()=>resolveBoardLanding(p,region,oldLocal,newLocal,roll));
+}
 
 function monsterRegionBonus(runRegionIndex){
   return [0,0,1,2][runRegionIndex] ?? 0;
@@ -3205,6 +3912,7 @@ function recalcEquipmentHp(p){
  p.hp=Math.max(1,Math.min(p.maxHp,p.hp+difference));
 }
 function equipPendingLoot(){
+ MQAudio.play("equip");
  const p=player(),card=G.pendingEquip;if(!card)return;
  const slot=lootSlot(card.monster);
  const oldAttack=attack(p);
@@ -3229,11 +3937,13 @@ function equipPendingLoot(){
  if(slot==="armour")statChange=`<br>❤️ Max HP: <b>${oldMaxHp} → ${newMaxHp}</b>`;
 
  showMessage(`✅ <b>${card.monster[5]} equipped.</b><br>${oldName} is now inactive.${statChange}<br><br>Press <b>➡️ End Turn</b>.`);
+ hideBattleOverlay();
  syncMultiplayerAll();
 }
 function keepCurrentLoot(){
- const card=G.pendingEquip;G.pendingEquip=null;$("end").disabled=false;render();
+ const card=G.pendingEquip;if(!card)return;G.pendingEquip=null;$("end").disabled=false;render();
  showMessage(`🃏 <b>${card.monster[5]}</b> stays in your card collection. Your current equipment remains active.<br><br>Press <b>➡️ End Turn</b>.`);
+ hideBattleOverlay();
  syncMultiplayerAll();
 }
 
@@ -3243,6 +3953,50 @@ function usePotion(){
  const heal=Math.min(5,p.maxHp-p.hp);p.hp+=heal;p.potions--;
  render();flashPlayerChange(G.multiplayer?G.multiplayer.playerIndex:0,"heal");showMessage(`🧪 <b>Health Potion used.</b> You recover ${heal} HP.`);
  syncMultiplayerAll();
+}
+
+
+let battleCloseTimer=null;
+function setBattleDieFace(value){const die=$("battleDie");if(!die)return;const v=Math.max(1,Math.min(6,parseInt(value,10)||1));die.className=`battleDie face${v}`}
+function animateBattleDie(value,detail=""){const die=$("battleDie");if(!die)return;const v=Math.max(1,Math.min(6,parseInt(value,10)||1));$("battleRollValue").textContent="…";$("battleRollDetail").textContent="Rolling...";die.classList.add("rolling");let ticks=0;const timer=setInterval(()=>{setBattleDieFace(1+Math.floor(Math.random()*6));$("battleDie").classList.add("rolling");if(++ticks>=9){clearInterval(timer);setBattleDieFace(v);$("battleRollValue").textContent=String(value);$("battleRollDetail").textContent=detail||"Battle roll"}},52)}
+function battleCardKeyChance(e){if(e?.cardData?.keyChance!==undefined)return e.cardData.keyChance;return ({COMMON:10,UNCOMMON:20,RARE:35,LEGENDARY:60}[e?.rarity]||0)+"%"}
+function updateBattlePlayerPanel(p=player()){if(!p)return;const idx=G&&G.multiplayer?G.multiplayer.playerIndex:0;const hpPct=Math.max(0,Math.min(100,Math.round((p.hp/p.maxHp)*100)));$("battlePlayerPawn").classList.toggle("red",idx===1);$("battleHpFill").style.width=`${hpPct}%`;$("battleHpText").textContent=`${p.hp} / ${p.maxHp}`;$("battlePlayerAttack").textContent=`+${attack(p)}`;$("battleAccessory").textContent=equippedAccessoryName(p)||"None"}
+function showBattleOverlay(e,spectator=false){if(!e||!e.monster)return;const o=$("battleOverlay"),p=player(),d=e.cardData||{},activeIndex=G&&G.multiplayer?G.active:0;o.classList.toggle("spectator",!!spectator);o.classList.add("open");o.setAttribute("aria-hidden","false");$("battleRegion").textContent=String(d.region||REGIONS[G.regionOrder[currentRegionIndex(p)]]?.name||"MONSTER REGION");$("battleMonsterName").textContent=e.monster[0];$("battleMonsterRarity").textContent=e.rarity||d.rarity||"MONSTER";$("battleMonsterDamage").textContent=e.monster[4];$("battleKeyChance").textContent=battleCardKeyChance(e);$("battleRequired").textContent=`${e.difficulty}+`;$("battleScaling").textContent=e.regionBonus>0?`Base ${e.baseDifficulty}+ · Region bonus +${e.regionBonus}`:"Base difficulty";$("battleMonsterImage").src=d.image||"";$("battleMonsterArt").style.display=d.image?"block":"none";$("battleSpectatorBadge").textContent=spectator?`WATCHING PLAYER ${activeIndex+1}`:`PLAYER ${activeIndex+1} · YOUR BATTLE`;updateBattlePlayerPanel(p);setBattleDieFace(1);$("battleRollValue").textContent="—";$("battleRollDetail").textContent="Awaiting battle roll";$("battleResult").className="battleResult hidden";$("battleActions").style.display=spectator?"none":"grid";$("battleFooterText").textContent=spectator?`Player ${activeIndex+1} is deciding whether to fight.`:"Defeat the monster to claim its card and loot."}
+function hideBattleOverlay(){const o=$("battleOverlay");if(!o)return;o.classList.remove("open","spectator");o.setAttribute("aria-hidden","true")}
+function showBattleResult(win,title,text){MQAudio.play(win?"victory":"defeat");const r=$("battleResult");r.className=`battleResult ${win?"win":"loss"}`;$("battleResultTitle").textContent=title;$("battleResultText").textContent=text;$("battleActions").style.display="none";$("battleFooterText").textContent=win?"Monster defeated. Choose what to do with the loot.":"Battle lost. Returning to the board..."}
+
+function restoreBattleFightButtons(){
+ const actions=$("battleActions");
+ if(!actions)return;
+ actions.className="battleActions";
+ actions.innerHTML=`<button id="battleFightBtn" class="battleFightBtn">⚔ FIGHT</button><button id="battlePassBtn" class="secondary">PASS</button>`;
+ actions.style.display="grid";
+ $("battleFightBtn").onclick=()=>{if(!isMyMultiplayerTurn()||G.phase!=="encounter")return;fightOptional();};
+ $("battlePassBtn").onclick=()=>{if(!isMyMultiplayerTurn()||G.phase!=="encounter")return;passEncounter();};
+}
+
+function showBattleLootChoice(card,foundKey){
+ const p=player();
+ const actions=$("battleActions");
+ if(!actions||!card)return;
+ const slot=lootSlot(card.monster);
+ const slotName={weapon:"⚔ WEAPON",armour:"🛡 ARMOUR",accessory:"💍 ACCESSORY"}[slot];
+ const current=p.equipment[slot];
+ const currentText=current?`${current.monster[5]} — ${current.monster[6]}`:"Empty slot";
+ actions.className="battleActions battleLootActions";
+ actions.innerHTML=`
+   <div class="battleLootPanel">
+     <div class="battleLootEyebrow">${foundKey?"🗝 REGIONAL KEY FOUND · ":""}${slotName} DROP</div>
+     <div class="battleLootName">${card.monster[5]}</div>
+     <div class="battleLootEffect">${card.monster[6]}</div>
+     <div class="battleLootCompare"><span>CURRENT</span><b>${currentText}</b></div>
+   </div>
+   <button id="battleEquipBtn" class="battleEquipBtn">✅ EQUIP NEW ITEM</button>
+   <button id="battleKeepBtn" class="secondary">KEEP CURRENT</button>`;
+ actions.style.display="grid";
+ $("battleEquipBtn").onclick=()=>equipPendingLoot();
+ $("battleKeepBtn").onclick=()=>keepCurrentLoot();
+ $("battleFooterText").textContent="Choose your equipment before ending the turn.";
 }
 
 function beginOptionalEncounter(e){
@@ -3267,6 +4021,8 @@ function beginOptionalEncounter(e){
   } else {
     hideMonsterCard();
   }
+  restoreBattleFightButtons();
+  showBattleOverlay(e,false);
 
   $("roll").disabled=true;
   $("fight").disabled=false;
@@ -3291,6 +4047,7 @@ function fightOptional(){
  let accessoryNote="";
 
  animateDiceResult(`🎲 ${roll}`);
+ animateBattleDie(roll,`${roll} + ${attack(p)} Attack`);
 
  // Once-per-region reroll of a failed monster battle.
  if(total<e.difficulty && canUseAccessoryOnce(p,ri) && /reroll (a )?failed monster battle/i.test(effect)){
@@ -3299,6 +4056,7 @@ function fightOptional(){
    roll=d6();
    total=roll+attack(p);
    animateDiceResult(`🎲 ${firstRoll} → 💍 ${roll}`);
+   animateBattleDie(roll,`Reroll ${firstRoll} → ${roll} · +${attack(p)} Attack`);
    accessoryNote=`💍 <b>${accName} activated.</b> Failed roll ${firstRoll} was rerolled to ${roll}.`;
  }
 
@@ -3341,11 +4099,13 @@ function fightOptional(){
    }
 
    e.accessoryNote=accessoryNote;
+   showBattleResult(true,"VICTORY",`${roll} + ${attack(p)} = ${total} · ${e.monster[0]} defeated`);
    G.pendingEquip=e;
    hideMonsterCard();G.encounter=null;G.phase="move";
    $("roll").disabled=true;$("fight").disabled=true;$("pass").disabled=true;$("end").disabled=true;
    render();
    showEquipChoice(e,foundKey);
+   showBattleLootChoice(e,foundKey);
 
  }else{
    let damage=e.monster[4];
@@ -3397,6 +4157,9 @@ function fightOptional(){
      }
    }
 
+   showBattleResult(false,"DEFEAT",`${roll} + ${attack(p)} = ${total} · You take ${damage} damage`);
+   updateBattlePlayerPanel(p);
+   setTimeout(hideBattleOverlay,900);
    hideMonsterCard();G.encounter=null;G.phase="move";
    $("roll").disabled=true;$("fight").disabled=true;$("pass").disabled=true;$("end").disabled=false;
 
@@ -3416,6 +4179,7 @@ function fightOptional(){
 function passEncounter(){
  if(G.phase!=="encounter")return;
  G.encounter=null;G.phase="move";
+ hideBattleOverlay();
  hideMonsterCard();$("roll").disabled=true;$("fight").disabled=true;$("pass").disabled=true;$("end").disabled=false;
  render();showMessage(`You passed the optional encounter. No damage, no reward.<br><br>Press <b>➡️ End Turn</b> when ready.`);
  syncMultiplayerAll();
@@ -3436,21 +4200,22 @@ function enterRoadOfDefeat(region){
 }
 
 function rollRoad(){
- const p=player(),ri=p.roadRegion;
- const base=d6();
- const bonus=movementBonus(p);
- let n=base+bonus;
+ const p=player(),ri=p.roadRegion;if(G.movementBusy)return;
+ const base=d6(),bonus=movementBonus(p);let n=base+bonus;
  if(p.roadSlow){n=Math.max(1,n-p.roadSlow);p.roadSlow=0}
  if(p.roadCap){n=Math.min(n,p.roadCap);p.roadCap=0}
- animateDiceResult(bonus?`🎲 ${base} + 💍1 = ${n}`:`🎲 ${n}`);
- $("roll").disabled=true;
- p.roadPos+=n;
- if(p.roadPos>=7){
-   finishRoad();
-   return;
- }
- const penalty=G.roads[ri][p.roadPos-1];
- applyRoadPenalty(p,penalty);
+ animateDiceResult(bonus?`🎲 ${base} + 💍1 = ${n}`:`🎲 ${n}`);$("roll").disabled=true;$("end").disabled=true;
+ const oldPos=p.roadPos,newPos=oldPos+n;G.movementBusy=true;
+ const animation={kind:"road",region:ri,from:oldPos,to:Math.min(newPos,7),playerIndex:G.multiplayer?G.multiplayer.playerIndex:G.active,nonce:`${Date.now()}-${Math.random().toString(36).slice(2,7)}`};
+ showMessage(`☠️ You rolled <b>${n}</b>. Crossing the Road of Defeat...`);
+ startSharedMovementAnimation(animation).then(()=>{
+   p.roadPos=newPos;endSharedMovementAnimation();
+   if(p.roadPos>=7){finishRoad();return}
+   render();
+   const roadEl=document.querySelector(`[data-road-region="${ri}"][data-road-space="${p.roadPos}"]`);
+   if(roadEl){roadEl.classList.add("roadLanding");setTimeout(()=>roadEl.classList.remove("roadLanding"),850)}
+   applyRoadPenalty(p,G.roads[ri][p.roadPos-1]);
+ });
 }
 
 function applyRoadPenalty(p,penalty){
@@ -3708,6 +4473,8 @@ function fightBoss(){
 }
 
 function resetRunAfterDeath(){
+  hideBattleOverlay();
+  G.movementAnimation=null;G.movementBusy=false;
   animateDeath();
   const savedBook=loadCollectionBook();
 
@@ -3838,7 +4605,8 @@ function multiplayerTurnSnapshot(){
    diceValue:$("rollValue")?$("rollValue").textContent:"—",
    diceDetail:$("rollDetail")?$("rollDetail").textContent:"Awaiting roll",
    message:$("msg")?$("msg").innerHTML:"",
-   cardVisible:!!(G.encounter && G.encounter.cardData)
+   cardVisible:!!(G.encounter && G.encounter.cardData),
+   movementAnimation:G.movementAnimation||null
  }));
 }
 function syncMultiplayerTurnState(){
@@ -3987,6 +4755,7 @@ function restoreMultiplayerTurnForActivePlayer(){
  if(!G || !G.multiplayer || !isMyMultiplayerTurn())return;
 
  const p=player();
+ G.movementAnimation=null;G.movementBusy=false;
  const phase=p.turnPhase||"move";
  G.phase=phase;
  G.encounter=null;
@@ -4067,6 +4836,7 @@ function applyRemoteRoomState(room){
    G.encounter=room.turnState.encounter||null;
    G.boss=room.turnState.boss||null;
    G.winner=room.turnState.winner||null;
+   G.movementAnimation=room.turnState.movementAnimation||null;
 
    if(room.turnState.diceValue && room.turnState.diceValue!=="—"){
      const dv=parseInt(room.turnState.diceValue,10);
@@ -4078,8 +4848,10 @@ function applyRemoteRoomState(room){
 
    if(G.phase==="encounter" && G.encounter && G.encounter.cardData){
      showMonsterCard(G.encounter.cardData);
+     showBattleOverlay(G.encounter,true);
    }else{
      hideMonsterCard();
+     hideBattleOverlay();
    }
 
    if((G.phase==="boss" || G.phase==="gate" || G.phase==="gateChoiceKey" || G.phase==="finalBoss") && G.boss){
@@ -4095,7 +4867,8 @@ function applyRemoteRoomState(room){
  render();
  renderMultiplayerPlayerCards();
  applyTurnLock();
- if(turnChanged)announceTurnTransition();
+ if(G.movementAnimation && !amActivePlayer)playRemoteMovementAnimation(G.movementAnimation);
+ if(turnChanged){announceTurnTransition();showTurnTransition(nextActive,amActivePlayer);}
 }
 
 window.MQMultiplayerBridge={
@@ -4131,7 +4904,14 @@ $("retreat").onclick=returnToTown;
 $("potion").onclick=usePotion;
 $("end").onclick=()=>{if(!isMyMultiplayerTurn())return;endTurn();};
 $("new").onclick=newGame;
+$("soundToggle").onclick=async()=>{await MQAudio.unlock();MQAudio.toggle();};
+$("musicDown").onclick=async()=>{await MQAudio.unlock();MQAudio.changeMusic(-.10);};
+$("musicUp").onclick=async()=>{await MQAudio.unlock();MQAudio.changeMusic(.10);};
+$("sfxDown").onclick=async()=>{await MQAudio.unlock();MQAudio.changeSfx(-.10);};
+$("sfxUp").onclick=async()=>{await MQAudio.unlock();MQAudio.changeSfx(.10);};
 $("menu").onclick=showStartScreen;
+if($("battleFightBtn"))$("battleFightBtn").onclick=()=>{if(!isMyMultiplayerTurn()||G.phase!=="encounter")return;fightOptional();};
+if($("battlePassBtn"))$("battlePassBtn").onclick=()=>{if(!isMyMultiplayerTurn()||G.phase!=="encounter")return;passEncounter();};
 
 function renderMenuBook(){
  const book=loadCollectionBook();
@@ -4174,6 +4954,8 @@ function renderMenuBook(){
  }).join("");
 }
 function showStartScreen(){
+ MQAudio.stopAmbience();
+ MQAudio.stopMusic();
  $("startScreen").style.display="flex";
  $("bookScreen").style.display="none";
  $("gameShell").classList.add("hiddenGame");
@@ -4209,6 +4991,8 @@ $("joinRoomBtn").onclick=async()=>{
  finally{$("joinRoomBtn").disabled=false;}
 };
 
+MQAudio.updateButton();
+MQAudio.updateVolumeUI();
 $("closeBookBtn").onclick=showStartScreen;
 $("menuResetBook").onclick=()=>{
  if(confirm("Reset all Collection Book discoveries?")){
@@ -5957,12 +6741,15 @@ window.MQFirebase={
 
 try{
  await ensureSignedIn();
- window.MQMultiplayerBridge.setStatus("Firebase connected. Full-Face Dice Fix v4.3.6 ready.");
+ window.MQMultiplayerBridge.setStatus("Firebase connected. Stage 4C.1 Dynamic Soundtrack v4.6.1 ready.");
 }catch(err){
  console.error(err);
  window.MQMultiplayerBridge.setStatus(`Firebase connection failed: ${err.message}`,true);
 }
 </script>
+
+
+
 
 </body>
 </html>
